@@ -28,7 +28,7 @@ def _aliases(name: str) -> set[str]:
 def load_gazetteer(path: Path) -> PlaceIndex:
     index = PlaceIndex()
     with zipfile.ZipFile(path) as archive:
-        [member] = [n for n in archive.namelist() if n.endswith(".txt")]
+        [member] = [n for n in archive.namelist() if n.endswith(".txt") and not n.startswith("__MACOSX/")]
         with archive.open(member) as raw:
             reader = csv.DictReader(io.TextIOWrapper(raw, encoding="latin-1"), delimiter="\t")
             for record in reader:

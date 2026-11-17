@@ -40,3 +40,13 @@ def test_load_gazetteer_builds_index_with_aliases(tmp_path):
     place = index.locate("INDIANAPOLIS", "IN")
     assert place == Place(39.776, -86.146, pytest.approx(math.sqrt(3141592.65 / math.pi)))
     assert index.locate("NASHVILLE", "TN") is not None
+
+
+def test_load_gazetteer_ignores_macos_metadata_entries(tmp_path):
+    path = tmp_path / "gaz.zip"
+    row = "OK\t1\t1\tBig Cabin town\t43\tA\t100\t0\t0\t0\t36.5\t-95.2\n"
+    with zipfile.ZipFile(path, "w") as archive:
+        archive.writestr("__MACOSX/._gaz.txt", "binary metadata")
+        archive.writestr("gaz.txt", HEADER + row)
+
+    assert load_gazetteer(path).locate("Big Cabin", "OK") is not None
