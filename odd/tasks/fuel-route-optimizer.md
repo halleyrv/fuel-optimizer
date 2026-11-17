@@ -26,7 +26,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - [ ] T2 S6: Nominatim fallback for unmatched cities, cached in `data/geocode_cache.json` — inline
 - [x] T3 S3 S4 S10 S11: fuel optimizer (pure domain, TDD) — inline — branch feat/fuel-optimizer
 - [x] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline — branch feat/route-planning (2d3209f, f91d624, 1618472, refactor + feat(trip))
-- [ ] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline
+- [x] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline — branch feat/api (feat(api), perf(routing))
 - [ ] T6: README, Loom script — inline
 - [ ] T7 S12: refactor `plan_fuel` with guard clauses (origin out of the loop, extract `_next_stop` and `_buy`), no interfaces or Strategy; tests green incl. DP cross-check and mutmut; one commit per step — inline, after T6
 
@@ -44,3 +44,4 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L10: T4 done. OSRM verified live: NoRoute returns HTTP 400 with JSON body (handled). Corridor NY→LA: 349 stations in 0.43 s. End to end NY→LA: 2,810 mi, 281 gal, $857.34, 19 stops, 3.2 s, 1 OSRM call. Dataset limitation: only 16 CA rows (Imperial Valley), last station before LA is Las Vegas area (~235 mi, within range). mutmut 220/223 (3 documented equivalents). 66 tests pass.
 - L11: Open question for the user: the optimal plan has many tiny purchases (0.9 gal, 1.1 gal) and 19 stops; cost-optimal but impractical. Options: a minimum purchase or a per-stop cost. Not implemented without a decision.
 - L12: L11 resolved by S13 (documented in domain-rules "Known trade-off: number of stops").
+- L13: T5 done. POST /api/v1/routes/optimize/ + GET /api/v1/routes/map/ (Leaflet). Live: NY→LA 200, 61 KB, 3.6 s cold, 0.73 s cached; 404 and 400 verified live. "Atlantis, ZZ" resolves via Nominatim to Atlantis, FL (real city). 81 tests pass.
