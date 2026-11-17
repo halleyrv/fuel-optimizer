@@ -41,7 +41,6 @@ Read the relevant documentation before implementing a task:
 - `docs/architecture.md`: architecture and dependency rules.
 - `docs/domain-rules.md`: business rules and optimization algorithm.
 - `docs/api-contract.md`: API specifications.
-- `odd/tasks/fuel-route-optimizer.md`: current development tasks and decisions log.
 - `docs/review-guidelines.md`: how to review a change (read it when acting as reviewer).
 
 Do not load unrelated documentation unnecessarily.
