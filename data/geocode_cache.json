@@ -1,0 +1,538 @@
+{
+  "ALVADA|OH": {
+    "lat": 41.0503322,
+    "lon": -83.4018693
+  },
+  "ANTIOCH|TN": {
+    "lat": 36.0600602,
+    "lon": -86.6722192
+  },
+  "BELDEN|MS": {
+    "lat": 34.3103831,
+    "lon": -88.7883888
+  },
+  "BETHANY|LA": {
+    "lat": 32.3737683,
+    "lon": -94.0379649
+  },
+  "BLAKESLEE|PA": {
+    "lat": 41.0925133,
+    "lon": -75.5926681
+  },
+  "BOIS D ARC|MO": {
+    "lat": 37.2564382,
+    "lon": -93.507696
+  },
+  "BREEZEWOOD|PA": {
+    "lat": 39.9990119,
+    "lon": -78.2404221
+  },
+  "BRIDGEWATER|MA": {
+    "lat": 41.9902206,
+    "lon": -70.9754432
+  },
+  "BROGUE|PA": {
+    "lat": 39.8723546,
+    "lon": -76.4846387
+  },
+  "CANDLER|NC": {
+    "lat": 35.5444359,
+    "lon": -82.6838032
+  },
+  "CANON CITY|CO": {
+    "lat": 38.4422506,
+    "lon": -105.2348795
+  },
+  "CASA BLANCA|NM": {
+    "lat": 35.046318,
+    "lon": -107.4713938
+  },
+  "CASTLE CREEK|NY": {
+    "lat": 42.2275753,
+    "lon": -75.918253
+  },
+  "CEDAR GROVE|TN": {
+    "lat": 36.2517196,
+    "lon": -86.5277724
+  },
+  "CHAPPELL HILL|TX": {
+    "lat": 30.141529,
+    "lon": -96.2567185
+  },
+  "CHESTERFIELD|VA": {
+    "lat": 37.3859982,
+    "lon": -77.578509
+  },
+  "CLEAR BROOK|VA": {
+    "lat": 39.2564912,
+    "lon": -78.096111
+  },
+  "CLINES CORNERS|NM": {
+    "lat": 35.0094982,
+    "lon": -105.66918
+  },
+  "COLGATE|WI": {
+    "lat": 43.1928301,
+    "lon": -88.2067737
+  },
+  "CROSS JUNCTION|VA": {
+    "lat": 39.3203785,
+    "lon": -78.2933382
+  },
+  "CURTIS BAY|MD": {
+    "lat": 39.2252188,
+    "lon": -76.5900312
+  },
+  "DENMARK|TN": {
+    "lat": 35.5328546,
+    "lon": -89.003952
+  },
+  "DIAMOND|OH": {
+    "lat": 41.0989463,
+    "lon": -81.022871
+  },
+  "DOSWELL|VA": {
+    "lat": 37.8601402,
+    "lon": -77.4641492
+  },
+  "DREWRYVILLE|VA": {
+    "lat": 36.7157055,
+    "lon": -77.3063603
+  },
+  "DRUMS|PA": {
+    "lat": 41.018139,
+    "lon": -75.9949252
+  },
+  "DUMONT|CO": {
+    "lat": 39.7646887,
+    "lon": -105.600337
+  },
+  "EASTABOGA|AL": {
+    "lat": 33.6059367,
+    "lon": -86.0213587
+  },
+  "EDWARDS|IL": {
+    "lat": 38.410254,
+    "lon": -88.0584362
+  },
+  "ELIZABETHPORT|NJ": {
+    "lat": 40.6501031,
+    "lon": -74.1870888
+  },
+  "ELLABELL|GA": {
+    "lat": 32.1235368,
+    "lon": -81.4856673
+  },
+  "ELLENWOOD|GA": {
+    "lat": 33.6101096,
+    "lon": -84.287978
+  },
+  "ETTERS|PA": {
+    "lat": 40.2245912,
+    "lon": -76.8980809
+  },
+  "FACKLER|AL": {
+    "lat": 34.7925827,
+    "lon": -85.9099775
+  },
+  "FEASTERVILLE TREVOSE|PA": {
+    "lat": 40.1514065,
+    "lon": -74.9886785
+  },
+  "FORTSON|GA": {
+    "lat": 33.3778914,
+    "lon": -84.2888119
+  },
+  "FRANKSVILLE|WI": {
+    "lat": 42.7600188,
+    "lon": -87.9134133
+  },
+  "GANSEVOORT|NY": {
+    "lat": 43.1962051,
+    "lon": -73.6513967
+  },
+  "GLADSTONE|VA": {
+    "lat": 37.5468094,
+    "lon": -78.8494619
+  },
+  "GLENDALE|KY": {
+    "lat": 37.6017278,
+    "lon": -85.9055189
+  },
+  "GLENMONT|NY": {
+    "lat": 42.604802,
+    "lon": -73.7695658
+  },
+  "GRASSY BUTTE|ND": {
+    "lat": 47.3952923,
+    "lon": -103.2490767
+  },
+  "GREENTOWN|PA": {
+    "lat": 41.321755,
+    "lon": -75.3054585
+  },
+  "GROVERTOWN|IN": {
+    "lat": 41.3750434,
+    "lon": -86.5047339
+  },
+  "GUM SPRING|VA": {
+    "lat": 37.7755262,
+    "lon": -77.8968114
+  },
+  "HAMPTONVILLE|NC": {
+    "lat": 36.0984684,
+    "lon": -80.760345
+  },
+  "HANKAMER|TX": {
+    "lat": 29.8582755,
+    "lon": -94.6268618
+  },
+  "HARPURSVILLE|NY": {
+    "lat": 42.1784124,
+    "lon": -75.6246298
+  },
+  "HARTFORD|TN": {
+    "lat": 35.8167646,
+    "lon": -83.1432066
+  },
+  "HEISKELL|TN": {
+    "lat": 36.081816,
+    "lon": -84.0539821
+  },
+  "HENRICO|VA": {
+    "lat": 37.5131191,
+    "lon": -77.3465081
+  },
+  "HOGANSBURG|NY": {
+    "lat": 44.9739364,
+    "lon": -74.6632416
+  },
+  "HOT SPRINGS NATIONAL PARK|AR": {
+    "lat": 34.5290712,
+    "lon": -93.0301402
+  },
+  "HUNT VALLEY|MD": {
+    "lat": 39.4962709,
+    "lon": -76.6542571
+  },
+  "HURRICANE MILLS|TN": {
+    "lat": 35.9711736,
+    "lon": -87.781969
+  },
+  "IRVINGTON|AL": {
+    "lat": 30.5068623,
+    "lon": -88.2338925
+  },
+  "IRVING|NY": {
+    "lat": 42.5675589,
+    "lon": -79.1128169
+  },
+  "ISOM|KY": {
+    "lat": 37.1878764,
+    "lon": -82.8987718
+  },
+  "IVYDALE|WV": {
+    "lat": 38.310097,
+    "lon": -81.7045688
+  },
+  "JEAN|NV": {
+    "lat": 35.7788568,
+    "lon": -115.3243823
+  },
+  "JOELTON|TN": {
+    "lat": 36.3131076,
+    "lon": -86.8652772
+  },
+  "KEARNEYSVILLE|WV": {
+    "lat": 39.3881556,
+    "lon": -77.8855516
+  },
+  "KNOXVILLE|AL": {
+    "lat": 33.5917715,
+    "lon": -85.8971885
+  },
+  "KODAK|TN": {
+    "lat": 35.9745323,
+    "lon": -83.6268396
+  },
+  "LAKE ARIEL|PA": {
+    "lat": 41.4539745,
+    "lon": -75.382681
+  },
+  "LAMBSBURG|VA": {
+    "lat": 36.5854078,
+    "lon": -80.7611817
+  },
+  "LANEXA|VA": {
+    "lat": 37.4237573,
+    "lon": -76.9010753
+  },
+  "LARSEN|WI": {
+    "lat": 44.1916501,
+    "lon": -88.623999
+  },
+  "LAWRENCE|MS": {
+    "lat": 31.5129753,
+    "lon": -90.1205396
+  },
+  "LEESVILLE|SC": {
+    "lat": 33.916532,
+    "lon": -81.5134368
+  },
+  "LENORAH|TX": {
+    "lat": 32.30456,
+    "lon": -101.8762483
+  },
+  "LINWOOD|NC": {
+    "lat": 35.7506938,
+    "lon": -80.3178306
+  },
+  "MAXWELL|TX": {
+    "lat": 29.881897,
+    "lon": -97.7956423
+  },
+  "MIDDLEBURY CENTER|PA": {
+    "lat": 41.8436841,
+    "lon": -77.2744202
+  },
+  "MIDDLESBORO|KY": {
+    "lat": 36.6072968,
+    "lon": -83.7143317
+  },
+  "MIDDLETON|MI": {
+    "lat": 43.1833659,
+    "lon": -84.7088895
+  },
+  "MIDLAND|GA": {
+    "lat": 32.5748608,
+    "lon": -84.827152
+  },
+  "MILLDALE|CT": {
+    "lat": 41.5661372,
+    "lon": -72.8999672
+  },
+  "MILLERSVILLE|MD": {
+    "lat": 39.0595542,
+    "lon": -76.6480219
+  },
+  "MILLTOWN|MT": {
+    "lat": 46.8712952,
+    "lon": -113.8817192
+  },
+  "MOAPA|NV": {
+    "lat": 36.75295,
+    "lon": -114.648614
+  },
+  "MONROE TOWNSHIP|NJ": {
+    "lat": 40.335756,
+    "lon": -74.4334464
+  },
+  "MONROETON|PA": {
+    "lat": 41.7125751,
+    "lon": -76.4746649
+  },
+  "MOUNT NEBO|WV": {
+    "lat": 39.6023047,
+    "lon": -79.7078303
+  },
+  "NEW BOSTON|MI": {
+    "lat": 42.1625408,
+    "lon": -83.4029885
+  },
+  "NEW HAMPTON|NY": {
+    "lat": 41.4098658,
+    "lon": -74.4117435
+  },
+  "NEWBURG|MD": {
+    "lat": 38.3773478,
+    "lon": -76.9533055
+  },
+  "NEWPORT|MI": {
+    "lat": 42.0022672,
+    "lon": -83.3085419
+  },
+  "NEWTON LOWER FALLS|MA": {
+    "lat": 42.3258005,
+    "lon": -71.2563409
+  },
+  "NORTH BILLERICA|MA": {
+    "lat": 42.5852621,
+    "lon": -71.2877645
+  },
+  "NORTH JACKSON|OH": {
+    "lat": 41.1001272,
+    "lon": -80.8571741
+  },
+  "NORTH OXFORD|MA": {
+    "lat": 42.1500947,
+    "lon": -71.8684054
+  },
+  "NOTTINGHAM|MD": {
+    "lat": 39.3639964,
+    "lon": -76.4521842
+  },
+  "ORLA|TX": {
+    "lat": 31.8250149,
+    "lon": -103.9090099
+  },
+  "OTTAWA LAKE|MI": {
+    "lat": 41.7641517,
+    "lon": -83.7493869
+  },
+  "PENDLETON|KY": {
+    "lat": 38.6914606,
+    "lon": -84.3689142
+  },
+  "PIONEER|TN": {
+    "lat": 36.4175798,
+    "lon": -84.3140995
+  },
+  "PROVIDENCE FORGE|VA": {
+    "lat": 37.4424264,
+    "lon": -77.0439583
+  },
+  "PRYOR|OK": {
+    "lat": 36.3084275,
+    "lon": -95.3169136
+  },
+  "PUEBLO OF ACOMA|NM": {
+    "lat": 34.8960604,
+    "lon": -107.5819746
+  },
+  "QUINTON|VA": {
+    "lat": 37.5327893,
+    "lon": -77.1154448
+  },
+  "RABUN GAP|GA": {
+    "lat": 34.9572143,
+    "lon": -83.3864536
+  },
+  "RAPHINE|VA": {
+    "lat": 37.9373548,
+    "lon": -79.2328102
+  },
+  "REDFORD|MI": {
+    "lat": 42.3833698,
+    "lon": -83.2965971
+  },
+  "RIDGEDALE|MO": {
+    "lat": 36.5039535,
+    "lon": -93.2237919
+  },
+  "RISING FAWN|GA": {
+    "lat": 34.7600791,
+    "lon": -85.531076
+  },
+  "ROANS PRAIRIE|TX": {
+    "lat": 30.5836549,
+    "lon": -95.943324
+  },
+  "ROCKVILLE|VA": {
+    "lat": 37.7259779,
+    "lon": -77.6783239
+  },
+  "ROSEDALE|VA": {
+    "lat": 36.9592782,
+    "lon": -81.9312351
+  },
+  "ROUND O|SC": {
+    "lat": 32.9371151,
+    "lon": -80.5409352
+  },
+  "RUTHER GLEN|VA": {
+    "lat": 37.9408753,
+    "lon": -77.4618647
+  },
+  "S COFFEYVILLE|OK": {
+    "lat": 36.9945248,
+    "lon": -95.6202552
+  },
+  "SAINT CROIX|IN": {
+    "lat": 38.2239531,
+    "lon": -86.5863387
+  },
+  "SAINT JOHNS|FL": {
+    "lat": 29.9032284,
+    "lon": -81.4145468
+  },
+  "SAWYER|MI": {
+    "lat": 41.8853207,
+    "lon": -86.5894666
+  },
+  "SKIPPERS|VA": {
+    "lat": 36.6118169,
+    "lon": -77.5466463
+  },
+  "SMITHS CREEK|MI": {
+    "lat": 42.9139187,
+    "lon": -82.6038085
+  },
+  "SUMMERFIELD|FL": {
+    "lat": 29.0085924,
+    "lon": -82.0348092
+  },
+  "SUPPLY|NC": {
+    "lat": 34.0176717,
+    "lon": -78.267499
+  },
+  "TAFTON|PA": {
+    "lat": 41.404534,
+    "lon": -75.1829535
+  },
+  "TEAYS|WV": {
+    "lat": 38.4417571,
+    "lon": -81.9529125
+  },
+  "TINNIE|NM": {
+    "lat": 33.3705561,
+    "lon": -105.2263673
+  },
+  "TOWNSEND|VA": {
+    "lat": 37.1849815,
+    "lon": -75.958473
+  },
+  "TROY|VA": {
+    "lat": 37.9509737,
+    "lon": -78.2463934
+  },
+  "WADDY|KY": {
+    "lat": 38.1370153,
+    "lon": -85.0743978
+  },
+  "WALL|TX": {
+    "lat": 31.3743455,
+    "lon": -100.30366
+  },
+  "WATERFALL|PA": {
+    "lat": 40.1275826,
+    "lon": -78.0627822
+  },
+  "WEST CHESTERFIELD|NH": {
+    "lat": 42.9042482,
+    "lon": -72.5156447
+  },
+  "WEST COXSACKIE|NY": {
+    "lat": 42.3606399,
+    "lon": -73.8167921
+  },
+  "WEST HELENA|AR": {
+    "lat": 34.5440124,
+    "lon": -90.6426195
+  },
+  "WESTOVER|MD": {
+    "lat": 38.1240114,
+    "lon": -75.7063171
+  },
+  "WILLOW BEACH|AZ": {
+    "lat": 35.8697801,
+    "lon": -114.6600654
+  },
+  "WINNABOW|NC": {
+    "lat": 34.1493374,
+    "lon": -78.0936046
+  },
+  "WOODFORD|VA": {
+    "lat": 38.1131886,
+    "lon": -77.4088708
+  }
+}

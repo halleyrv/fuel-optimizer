@@ -31,6 +31,7 @@ def files(tmp_path):
         "csv": str(tmp_path / "prices.csv"),
         "places": str(gazetteer(tmp_path / "places.zip", "OK\t1\t1\tBig Cabin town\t43\tA\t3141592.65\t0\t0\t0\t36.5378\t-95.2225\n")),
         "cousubs": str(gazetteer(tmp_path / "cousubs.zip", "PA\t2\t2\tBensalem township\t44\tA\t100\t0\t0\t0\t40.1\t-74.9\n")),
+        "city_cache": str(tmp_path / "geocode_cache.json"),  # never the real data/ cache
     }
 
 

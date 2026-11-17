@@ -81,7 +81,7 @@ sequenceDiagram
     API-->>C: route, fuel_stops, summary, map_url
 ```
 
-1. **Stations are geocoded once, at import.** The CSV has no coordinates and 7,464 of 8,151 addresses are highway exits (`I-44, EXIT 283`), so each station is placed at its city's center using the US Census Gazetteer (offline, public domain). 6,447 of 6,626 US stations resolve (97.3%).
+1. **Stations are geocoded once, at import.** The CSV has no coordinates and 7,464 of 8,151 addresses are highway exits (`I-44, EXIT 283`), so each station is placed at its city's center using the US Census Gazetteer (offline, public domain): 6,450 of 6,626 US stations (97.3%). The remaining 134 small communities were resolved once with Nominatim (each result checked against its state) and committed in `data/geocode_cache.json`, so the import stays offline and covers all 6,626.
 2. **One routing call per request.** OSRM's public server returns the full route geometry; repeated trips come from a 24 h cache with no call at all.
 3. **Corridor search in PostGIS.** A station qualifies within 5 km of the route plus its city's radius (capped at 10 km), using the spatial index. `ST_LineLocatePoint` gives its mile along the route.
 4. **Greedy optimizer.** At each station: buy just enough to reach the next cheaper station within range; if there is none, fill the tank and continue to the cheapest station in range. This is provably optimal for a single route, and it is verified against an exhaustive dynamic-programming search on 200 random routes.
@@ -125,7 +125,7 @@ The assignment leaves these open; each is a deliberate, documented decision ([`d
 
 | Check | Command | Result |
 |-------|---------|--------|
-| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 88 passing |
+| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 95 passing |
 | Mutation testing (domain) | `rm -rf mutants && uv run mutmut run` | 221 of 224 mutants detected; 3 equivalent, documented in [`docs/mutation-testing.md`](docs/mutation-testing.md) |
 | OpenAPI schema | `docker compose run --rm web python manage.py spectacular --validate --fail-on-warn` | valid, no warnings (also run in tests) |
 | External review | Antigravity, against [`docs/review-guidelines.md`](docs/review-guidelines.md) | 2 rounds; findings verified before fixing, 1 false positive dismissed with evidence |

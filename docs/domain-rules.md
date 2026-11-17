@@ -25,7 +25,7 @@ The supplied CSV has no coordinates. Addresses are highway references (`I-44, EX
 
 - Stations are geocoded once, at import time, never during API requests.
 - Locations are the internal point of the station's city, matched offline by city + state against the US Census Gazetteer: incorporated places first, then county subdivisions (New England towns, townships). Matching ignores case, punctuation, spacing and St/Ste/Ft/Mt abbreviations.
-- Cities missing from the Gazetteer are resolved once via Nominatim; results are cached in `data/geocode_cache.json` so imports stay offline and reproducible.
+- Cities missing from the Gazetteer are resolved once via Nominatim (`python manage.py resolve_missing_cities`, 1 request per second). A result outside the requested state is rejected. Results, including misses, are committed in `data/geocode_cache.json`, so imports stay offline and reproducible. These locations have no city area, so they get the base corridor only.
 - Every location is stored with `location_precision = "city"` and a `location_radius_m` (equivalent radius of the city's land area). These are approximations and must never be presented as exact station locations.
 - Rows outside the USA (Canadian provinces) are excluded.
 - Rows whose city cannot be resolved are excluded, and the import reports each exclusion reason.

@@ -56,3 +56,18 @@ def gazetteer_indexes() -> tuple[PlaceIndex, PlaceIndex]:
         load_gazetteer(data / "2024_Gaz_place_national.zip"),
         load_gazetteer(data / "2024_Gaz_cousubs_national.zip"),
     )
+
+
+def locate_city_online(city: str, state: str) -> Place | None:
+    """One Nominatim lookup for an import-time city; a result in another state is rejected."""
+    params = urlencode({"q": f"{city}, {state}", "format": "jsonv2", "countrycodes": "us", "limit": 1, "addressdetails": 1})
+    results = get_json("nominatim", f"{settings.NOMINATIM_URL}/search?{params}")
+    try:
+        if not results:
+            return None
+        best = results[0]
+        if best["address"].get("ISO3166-2-lvl4") != f"US-{state}":
+            return None
+        return Place(float(best["lat"]), float(best["lon"]), 0.0)
+    except (KeyError, TypeError, ValueError, AttributeError) as error:
+        raise ExternalServiceError(f"nominatim returned an unexpected response: {results!r}") from error

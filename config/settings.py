@@ -61,6 +61,7 @@ STATION_DATA_DIR = BASE_DIR / "data"
 OSRM_URL = os.environ.get("OSRM_URL", "https://router.project-osrm.org")
 NOMINATIM_URL = os.environ.get("NOMINATIM_URL", "https://nominatim.openstreetmap.org")
 EXTERNAL_TIMEOUT_SECONDS = float(os.environ.get("EXTERNAL_TIMEOUT_SECONDS", "10"))
+NOMINATIM_MIN_INTERVAL_SECONDS = 1.0  # usage policy: at most one request per second
 HTTP_USER_AGENT = "fuel-route-optimizer/0.1 (assessment demo)"
 
 # Corridor around the route: a station qualifies within base + its city radius (capped).

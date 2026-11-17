@@ -4,7 +4,7 @@ import pytest
 
 from fuel_route.application.plan_trip import ExternalServiceError
 from fuel_route.domain.geocoding import Place, PlaceIndex
-from fuel_route.infrastructure.locations import CityStateResolver, NominatimResolver
+from fuel_route.infrastructure.locations import CityStateResolver, NominatimResolver, locate_city_online
 from tests.infrastructure.fake_http import http_error, respond
 
 NEW_YORK = Place(40.71, -74.0, 1000.0)
@@ -68,3 +68,19 @@ def test_nominatim_http_error_is_reported_as_external_error():
 def test_nominatim_unexpected_payload_is_reported_as_external_error(payload):
     with respond(payload), pytest.raises(ExternalServiceError, match="nominatim"):
         NominatimResolver().resolve("Somewhere")
+
+
+def test_online_city_lookup_accepts_a_result_in_the_requested_state():
+    payload = [{"lat": "39.999", "lon": "-78.24", "address": {"ISO3166-2-lvl4": "US-PA"}}]
+
+    with respond(payload) as urlopen:
+        place = locate_city_online("Breezewood", "PA")
+
+    assert place == Place(39.999, -78.24, 0.0)
+    assert "addressdetails=1" in urlopen.call_args.args[0].full_url
+
+
+@pytest.mark.parametrize("payload", [[], [{"lat": "1", "lon": "2", "address": {"ISO3166-2-lvl4": "US-MD"}}]])
+def test_online_city_lookup_rejects_no_result_or_another_state(payload):
+    with respond(payload):
+        assert locate_city_online("Breezewood", "PA") is None
