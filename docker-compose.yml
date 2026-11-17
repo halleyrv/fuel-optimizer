@@ -1,0 +1,28 @@
+# Reads variables from .env (see .env.example). The fallbacks only serve local development.
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fuel}
+      POSTGRES_USER: ${POSTGRES_USER:-fuel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fuel-local}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
+      interval: 2s
+      retries: 30
+  web:
+    build: .
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    ports: ["8000:8000"]
+    volumes: [".:/app"]
+    environment:
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+      DATABASE_HOST: db
+      DATABASE_NAME: ${POSTGRES_DB:-fuel}
+      DATABASE_USER: ${POSTGRES_USER:-fuel}
+      DATABASE_PASSWORD: ${POSTGRES_PASSWORD:-fuel-local}
+    depends_on:
+      db:
+        condition: service_healthy
