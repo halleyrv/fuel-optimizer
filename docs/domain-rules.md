@@ -14,7 +14,7 @@ The 50-gallon capacity is an assumption derived from the supplied range and fuel
 
 The assignment does not say how much fuel the vehicle has when it departs. We assume **the trip includes the departure fill-up**: by default the vehicle has 0 gallons and buys its first fuel at a station near the origin, so the reported cost covers all the fuel the trip consumes ("total money spent on fuel").
 
-- Stations within the first 15 miles of the route (the origin window) can be used with an empty tank. Fuel bought there covers the route from mile 0, so total consumption stays exactly distance / MPG.
+- Stations within the first 15 miles of the route (the origin window) can be used with an empty tank. The fuel for the miles driven before reaching that station is bought there too, so total consumption stays exactly distance / MPG. Range checks always use each station's real position.
 - The optimizer decides how much to buy at departure; it does not have to fill the tank.
 - Clients that already carry fuel send `initial_fuel_gallons` (0 to 50). That fuel is not charged.
 - With an empty tank and no station inside the origin window, the route is reported as infeasible and the client is asked to provide `initial_fuel_gallons`.
@@ -48,10 +48,10 @@ The objective is to minimize total fuel purchase cost while ensuring the vehicle
 
 Use a greedy refueling strategy:
 
-1. At each reachable station, identify the nearest subsequent station with a lower fuel price that can be reached with the available fuel.
+1. At each station, identify the nearest subsequent station with a lower fuel price within a full tank's range (500 miles).
 2. If a cheaper station is reachable, purchase only enough fuel to reach it.
 3. If no cheaper station is reachable, purchase enough fuel to fill the tank, up to its capacity.
-4. If the destination is reachable with the available fuel, purchase only the amount needed to complete the trip.
+4. If the destination is within a full tank's range and no cheaper station comes first, purchase only the amount needed to complete the trip.
 5. Never exceed tank capacity or purchase negative quantities.
 6. After filling the tank because no cheaper station is in range, continue to the cheapest station in range.
 

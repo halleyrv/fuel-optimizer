@@ -145,3 +145,13 @@ def test_greedy_matches_the_exact_optimum_on_random_routes():
         else:
             plan = plan_fuel(D(route), stations, TRUCK, origin_window_miles=D(0))
             assert plan.total_cost == expected.quantize(D("0.01")), (route, stations)
+
+
+def test_origin_window_station_keeps_its_real_position_for_range_checks():
+    stations = [station(1, "10", "3.0"), station(2, "505", "3.0")]
+
+    plan = plan_fuel(D(600), stations, TRUCK, origin_window_miles=D(15))
+
+    # 1 gallon pays for the 10 miles driven before the departure station, then the tank is filled.
+    assert purchases(plan) == [(1, D(51), D("153.00")), (2, D(9), D("27.00"))]
+    assert_fuel_balances(plan, "600")

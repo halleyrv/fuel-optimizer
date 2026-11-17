@@ -66,7 +66,7 @@ class InfeasibleRoute(Exception):
 
 @dataclass(frozen=True)
 class _Point:
-    mile: Decimal  # effective mile: stations inside the origin window count as mile 0
+    mile: Decimal
     price: Decimal | None  # None: the origin, where nothing can be bought
     station: StationOnRoute | None = None
 
@@ -84,7 +84,7 @@ def plan_fuel(
     destination = _Point(route_miles, ZERO)
     on_route = sorted(
         (
-            _Point(ZERO if s.mile <= origin_window_miles else s.mile, s.price, s)
+            _Point(s.mile, s.price, s)
             for s in stations
             if ZERO <= s.mile <= route_miles
         ),
@@ -98,7 +98,10 @@ def plan_fuel(
         here = points[i]
         if here.price is None:
             j = i + 1
-            if points[j].mile > fuel * vehicle.mpg:
+            # Departure fill-up: an origin-window station is reachable even on an empty tank;
+            # the fuel for those first miles is bought (and paid) at that station.
+            departure = points[j].station is not None and points[j].mile <= origin_window_miles
+            if points[j].mile > fuel * vehicle.mpg and not departure:
                 reason = InfeasibleReason.NO_STATION_NEAR_ORIGIN if fuel == 0 else InfeasibleReason.GAP_EXCEEDS_RANGE
                 raise InfeasibleRoute(reason, ZERO)
         else:
@@ -112,7 +115,7 @@ def plan_fuel(
                 j, target = cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
             else:
                 j, target = min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
-            gallons = max(ZERO, target - fuel)
+            gallons = max(ZERO, target - fuel)  # fuel < 0 only after a departure-window arrival
             if gallons > 0:
                 stops.append(
                     FuelStop(
