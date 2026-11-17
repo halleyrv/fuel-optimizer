@@ -12,7 +12,7 @@ from fuel_route.domain.geocoding import Place, PlaceIndex
 # Census place types are lowercase, so "Carson City" keeps its capitalized "City".
 _TYPE_SUFFIX = re.compile(
     r"\s+(city and borough|consolidated government|metropolitan government|unified government"
-    r"|urban county|municipality|borough|township|village|town|city|CDP|CCD)\b.*$"
+    r"|urban county|municipality|borough|charter township|township|village|town|city|CDP|CCD)\b.*$"
 )
 
 

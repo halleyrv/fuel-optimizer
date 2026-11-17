@@ -19,6 +19,7 @@ HEADER = "USPS\tGEOID\tANSICODE\tNAME\tLSAD\tFUNCSTAT\tALAND\tAWATER\tALAND_SQMI
         ("Carson City", "Carson City"),
         ("Georgetown town", "Georgetown"),
         ("Bensalem township", "Bensalem"),
+        ("Canton charter township", "Canton"),
         ("Autaugaville CCD", "Autaugaville"),
     ],
 )
