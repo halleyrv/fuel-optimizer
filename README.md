@@ -91,17 +91,19 @@ sequenceDiagram
 Pragmatic hexagonal architecture ([`docs/architecture.md`](docs/architecture.md)):
 
 ```
-fuel_route/
-├── domain/            # pure Python: fuel optimizer, station and geocoding rules
-├── application/       # use cases: import_stations, plan_trip (+ Protocol ports)
-├── infrastructure/    # adapters: Census Gazetteer, Nominatim, OSRM, PostGIS, CSV
-├── api/               # DRF view, OpenAPI serializers, map page
-├── management/        # import_stations command
-└── templates/         # map page (Leaflet)
-config/                # Django settings and URLs
-docs/                  # assignment, domain rules, architecture, API contract, reviews
-data/                  # fuel price CSV + Census Gazetteer files
-tests/                 # domain, application, infrastructure, integration (PostGIS), api
+fuel-optimizer/
+├── fuel_route/
+│   ├── domain/          # pure Python: fuel optimizer, station and geocoding rules
+│   ├── application/     # use cases: import_stations, plan_trip (+ Protocol ports)
+│   ├── infrastructure/  # adapters: Census Gazetteer, Nominatim, OSRM, PostGIS, CSV
+│   ├── api/             # DRF view, OpenAPI serializers, map page
+│   ├── management/      # import_stations command
+│   └── templates/       # map page (Leaflet)
+├── config/              # Django settings and URLs
+├── docs/                # assignment, domain rules, architecture, API contract, reviews
+├── data/                # fuel price CSV + Census Gazetteer files
+├── tests/               # domain, application, infrastructure, integration (PostGIS), api
+└── docker-compose.yml   # API + PostGIS
 ```
 
 Dependencies point inward: `api` and `infrastructure` → `application` → `domain`. The domain imports nothing from Django, the database or HTTP clients.
