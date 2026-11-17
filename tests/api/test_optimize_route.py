@@ -62,6 +62,15 @@ def test_returns_route_stops_summary_and_map_link(client, planner):
     assert body["map_url"] == "http://testserver/map/?start=A%2C+NE&finish=B%2C+NE&initial_fuel_gallons=0"
 
 
+def test_map_link_uses_https_behind_a_tls_proxy(client, planner):
+    body = {"start": "A, NE", "finish": "B, NE"}
+
+    # A real proxy sends the public Host without a port, as Railway does.
+    response = client.post(URL, body, content_type="application/json", HTTP_HOST="localhost", HTTP_X_FORWARDED_PROTO="https")
+
+    assert response.json()["map_url"].startswith("https://localhost/map/?")
+
+
 def test_initial_fuel_defaults_to_zero(client, planner):
     post(client)
 

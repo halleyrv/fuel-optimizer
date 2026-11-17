@@ -6,4 +6,6 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv PATH="/opt/venv/bin:$PATH" PYTHONUNBUFFERED
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen
 COPY . .
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Production server; docker-compose.yml overrides it with runserver for local development.
+# PORT is set by hosting platforms such as Railway.
+CMD ["sh", "-c", "gunicorn config.wsgi --bind 0.0.0.0:${PORT:-8000} --workers 2 --timeout 60 --access-logfile -"]

@@ -1,0 +1,7 @@
+.git
+.env
+odd
+mutants
+.venv
+**/__pycache__
+.pytest_cache

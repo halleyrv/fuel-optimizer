@@ -12,6 +12,8 @@ if not SECRET_KEY:
         raise ImproperlyConfigured("DJANGO_SECRET_KEY is required when DJANGO_DEBUG is not 1")
     SECRET_KEY = "dev-only-insecure-key"
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
+# Behind a TLS-terminating proxy (Railway, Render...) so absolute URLs such as map_url use https.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.contenttypes",
@@ -42,6 +44,14 @@ DATABASES = {
         "HOST": os.environ.get("DATABASE_HOST", "localhost"),
         "PORT": os.environ.get("DATABASE_PORT", "5432"),
     }
+}
+
+# Django only prints errors to the console when DEBUG is on; hosting platforms read stdout/stderr.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "loggers": {"django": {"handlers": ["console"], "level": "WARNING"}},
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

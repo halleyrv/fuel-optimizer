@@ -150,7 +150,7 @@ The assignment leaves these open; each is a deliberate, documented decision ([`d
 
 | Check | Command | Result |
 |-------|---------|--------|
-| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 98 passing |
+| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 99 passing |
 | Mutation testing (domain) | `rm -rf mutants && uv run mutmut run` | 221 of 224 mutants detected; 3 equivalent, documented in [`docs/mutation-testing.md`](docs/mutation-testing.md) |
 | OpenAPI schema | `docker compose run --rm web python manage.py spectacular --validate --fail-on-warn` | valid, no warnings (also run in tests) |
 | External review | Antigravity, against [`docs/review-guidelines.md`](docs/review-guidelines.md) | 2 rounds; findings verified before fixing, 1 false positive dismissed with evidence |
@@ -159,9 +159,27 @@ The assignment leaves these open; each is a deliberate, documented decision ([`d
 
 These settings are intentional for running the assessment locally, not for production:
 
-- `DEBUG=1`, fallback database credentials and `runserver` in `docker-compose.yml`. Outside debug, `DJANGO_SECRET_KEY` is required and the app refuses to start without it.
+- `DEBUG=1`, fallback database credentials and `runserver` in `docker-compose.yml`. The image itself runs gunicorn, and outside debug `DJANGO_SECRET_KEY` is required: the app refuses to start without it.
 - No authentication on the API, because the assignment requires none.
 - Public OSRM and Nominatim servers. Both are rate-limited, so production should self-host them or use a paid provider.
+
+## Deploy (Railway)
+
+The Dockerfile is production-ready: gunicorn on `$PORT`, errors logged to stdout, HTTPS-aware links behind the platform proxy.
+
+1. Create a project with a **PostGIS** database (template `postgis-postgres`, same PostgreSQL 17 + PostGIS 3.5 as `docker-compose.yml`).
+2. Add a service from this GitHub repo. Railway builds the Dockerfile.
+3. Set the service variables, referencing the database service (check the exact variable names in its Variables tab):
+
+   | Variable | Value |
+   |----------|-------|
+   | `DJANGO_SECRET_KEY` | output of `python3 -c "import secrets; print(secrets.token_urlsafe(50))"` |
+   | `DJANGO_ALLOWED_HOSTS` | your public domain, e.g. `fuel-optimizer.up.railway.app` |
+   | `DATABASE_HOST` / `DATABASE_PORT` | `${{PostGIS.PGHOST}}` / `${{PostGIS.PGPORT}}` |
+   | `DATABASE_NAME` / `DATABASE_USER` / `DATABASE_PASSWORD` | `${{PostGIS.PGDATABASE}}` / `${{PostGIS.PGUSER}}` / `${{PostGIS.PGPASSWORD}}` |
+
+4. In Settings → Deploy, set the pre-deploy command to `python manage.py migrate && python manage.py import_stations` (it reloads the stations from the bundled CSV on every deploy, in one transaction).
+5. In Settings → Networking, generate a public domain and open `/map/`.
 
 ## Configuration
 
