@@ -27,7 +27,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - [x] T3 S3 S4 S10 S11: fuel optimizer (pure domain, TDD) — inline — branch feat/fuel-optimizer
 - [x] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline — branch feat/route-planning (2d3209f, f91d624, 1618472, refactor + feat(trip))
 - [x] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline — branch feat/api (feat(api), perf(routing))
-- [ ] T6: README, Loom script — inline
+- [x] T6: README, Loom script — inline — branch docs/readme
 - [ ] T7 S12: refactor `plan_fuel` with guard clauses (origin out of the loop, extract `_next_stop` and `_buy`), no interfaces or Strategy; tests green incl. DP cross-check and mutmut; one commit per step — inline, after T6
 
 ## Log
@@ -47,3 +47,4 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L13: T5 done. POST /api/v1/routes/optimize/ + GET /api/v1/routes/map/ (Leaflet). Live: NY→LA 200, 61 KB, 3.6 s cold, 0.73 s cached; 404 and 400 verified live. "Atlantis, ZZ" resolves via Nominatim to Atlantis, FL (real city). 81 tests pass.
 - L14: Antigravity review #2 (2f05265..cf83a32): 2 findings. Blocker "ST_LineLocatePoint NULL on zero-length route" DISMISSED: live start=finish (Effingham, IL) returns 200, and PostGIS returns 0 (not NULL) for a zero-length line. Advisory "Nominatim payload KeyError -> 500" CONFIRMED and fixed with RED test. 83 tests pass.
 - L15: User: "estándar ... apidocs así se hace siempre en todos los proyectos senior" → Swagger UI at /api/docs/ (drf-spectacular 0.30.0, verified in Context7). Schema validated with --fail-on-warn; drift tests compare real responses to documented serializers. api-contract.md reduced to non-schema conventions. 87 tests pass.
+- L16: T6 done. README quick start verified from a clean state (down -v, up --build, import, curl): Chicago→Denver $300.84. README examples are real API results. Loom script in odd/loom-script.md (5 min, English). README no longer references .env.example (user still has to create it; agent is denied .env* files).
