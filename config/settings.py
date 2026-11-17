@@ -52,3 +52,7 @@ OSRM_URL = os.environ.get("OSRM_URL", "https://router.project-osrm.org")
 NOMINATIM_URL = os.environ.get("NOMINATIM_URL", "https://nominatim.openstreetmap.org")
 EXTERNAL_TIMEOUT_SECONDS = float(os.environ.get("EXTERNAL_TIMEOUT_SECONDS", "10"))
 HTTP_USER_AGENT = "fuel-route-optimizer/0.1 (assessment demo)"
+
+# Corridor around the route: a station qualifies within base + its city radius (capped).
+CORRIDOR_BASE_METERS = float(os.environ.get("CORRIDOR_BASE_METERS", "5000"))
+CORRIDOR_RADIUS_CAP_METERS = float(os.environ.get("CORRIDOR_RADIUS_CAP_METERS", "10000"))

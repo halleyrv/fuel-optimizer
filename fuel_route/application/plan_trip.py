@@ -26,3 +26,22 @@ class Route:
 
 class Router(Protocol):
     def route(self, start: Place, finish: Place) -> Route: ...
+
+
+@dataclass(frozen=True)
+class CorridorStation:
+    """A station near the route, with its position along it (city-level location)."""
+
+    station_id: int
+    name: str
+    address: str
+    city: str
+    state: str
+    longitude: float
+    latitude: float
+    price: Decimal
+    mile: Decimal
+
+
+class StationFinder(Protocol):
+    def along(self, route: Route) -> list[CorridorStation]: ...
