@@ -1,7 +1,6 @@
 from urllib.error import URLError
 
 import pytest
-from django.core.cache import cache
 
 from fuel_route.application.plan_trip import ExternalServiceError
 from fuel_route.domain.geocoding import Place, PlaceIndex
@@ -9,11 +8,6 @@ from fuel_route.infrastructure.locations import CityStateResolver, NominatimReso
 from tests.infrastructure.fake_http import http_error, respond
 
 NEW_YORK = Place(40.71, -74.0, 1000.0)
-
-
-@pytest.fixture(autouse=True)
-def clear_cache():
-    cache.clear()
 
 
 class FakeFallback:

@@ -86,4 +86,4 @@ Same inputs as query parameters (`start`, `finish`, `initial_fuel_gallons`). Ret
 
 - `"City, ST"` start and finish: 0 geocoding calls (offline Gazetteer).
 - Other text: up to 2 Nominatim calls, cached.
-- Routing: exactly 1 OSRM call.
+- Routing: at most 1 OSRM call; a repeated trip is served from the route cache (24 h) with none.

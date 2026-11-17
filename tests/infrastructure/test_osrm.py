@@ -36,3 +36,14 @@ def test_no_route_between_points_is_reported():
 def test_network_failure_or_malformed_response_is_an_external_error(failure):
     with respond(failure), pytest.raises(ExternalServiceError, match="osrm"):
         OsrmRouter().route(NEW_YORK, PHILADELPHIA)
+
+
+def test_repeated_route_is_served_from_cache_without_a_second_call():
+    payload = {"code": "Ok", "routes": [{"distance": 1609.344, "duration": 60, "geometry": {"type": "LineString", "coordinates": LINE}}]}
+
+    with respond(payload) as urlopen:
+        first = OsrmRouter().route(NEW_YORK, PHILADELPHIA)
+        second = OsrmRouter().route(NEW_YORK, PHILADELPHIA)
+
+    assert first == second
+    assert urlopen.call_count == 1
