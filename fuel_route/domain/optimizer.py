@@ -67,8 +67,8 @@ class InfeasibleRoute(Exception):
 @dataclass(frozen=True)
 class _Point:
     mile: Decimal
-    price: Decimal | None  # None: the origin, where nothing can be bought
-    station: StationOnRoute | None = None
+    price: Decimal
+    station: StationOnRoute | None = None  # None: the destination
 
 
 def plan_fuel(
@@ -90,43 +90,40 @@ def plan_fuel(
         ),
         key=lambda p: (p.mile, p.price),
     )
-    points = [_Point(ZERO, None), *on_route, destination]
+    points = [*on_route, destination]
     full_range = vehicle.tank_gallons * vehicle.mpg
 
-    fuel, i, stops = initial_fuel, 0, []
+    # Departure: nothing can be bought at the origin. An origin-window station is reachable
+    # even on an empty tank; the fuel for those first miles is bought (and paid) there.
+    first = points[0]
+    departure_fill = first.station is not None and first.mile <= origin_window_miles
+    if first.mile > initial_fuel * vehicle.mpg and not departure_fill:
+        reason = InfeasibleReason.NO_STATION_NEAR_ORIGIN if initial_fuel == 0 else InfeasibleReason.GAP_EXCEEDS_RANGE
+        raise InfeasibleRoute(reason, ZERO)
+
+    fuel, i, stops = initial_fuel - first.mile / vehicle.mpg, 0, []
     while points[i] is not destination:
         here = points[i]
-        if here.price is None:
-            j = i + 1
-            # Departure fill-up: an origin-window station is reachable even on an empty tank;
-            # the fuel for those first miles is bought (and paid) at that station.
-            departure = points[j].station is not None and points[j].mile <= origin_window_miles
-            if points[j].mile > fuel * vehicle.mpg and not departure:
-                reason = InfeasibleReason.NO_STATION_NEAR_ORIGIN if fuel == 0 else InfeasibleReason.GAP_EXCEEDS_RANGE
-                raise InfeasibleRoute(reason, ZERO)
+        in_range = list(takewhile(lambda k: points[k].mile - here.mile <= full_range, range(i + 1, len(points))))
+        if not in_range:
+            raise InfeasibleRoute(InfeasibleReason.GAP_EXCEEDS_RANGE, here.station.mile)
+        cheaper = next((k for k in in_range if points[k].price < here.price), None)
+        if cheaper is not None:
+            j, target = cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
         else:
-            in_range = list(
-                takewhile(lambda k: points[k].mile - here.mile <= full_range, range(i + 1, len(points)))
-            )
-            if not in_range:
-                raise InfeasibleRoute(InfeasibleReason.GAP_EXCEEDS_RANGE, here.station.mile)
-            cheaper = next((k for k in in_range if points[k].price < here.price), None)
-            if cheaper is not None:
-                j, target = cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
-            else:
-                j, target = min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
-            gallons = max(ZERO, target - fuel)  # fuel < 0 only after a departure-window arrival
-            if gallons > 0:
-                stops.append(
-                    FuelStop(
-                        here.station.station_id,
-                        here.station.mile,
-                        here.price,
-                        gallons,
-                        (gallons * here.price).quantize(CENT),
-                    )
+            j, target = min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
+        gallons = max(ZERO, target - fuel)  # fuel < 0 only after a departure-window arrival
+        if gallons > 0:
+            stops.append(
+                FuelStop(
+                    here.station.station_id,
+                    here.station.mile,
+                    here.price,
+                    gallons,
+                    (gallons * here.price).quantize(CENT),
                 )
-                fuel += gallons
+            )
+            fuel += gallons
         fuel -= (points[j].mile - here.mile) / vehicle.mpg
         i = j
 
