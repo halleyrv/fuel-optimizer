@@ -1,9 +1,10 @@
 """Turns use-case results and failures into the JSON shapes of docs/api-contract.md."""
 
+import json
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any
 
-from django.contrib.gis.geos import LineString
+from django.contrib.gis.geos import GEOSGeometry
 from rest_framework.views import exception_handler
 
 from fuel_route.application.plan_trip import ExternalServiceError, LocationNotFound, RouteNotFound, TripPlan
@@ -20,7 +21,9 @@ def number(value: Decimal, places: int) -> float:
 def trip_to_dict(trip: TripPlan, map_url: str) -> dict[str, Any]:
     plan, route = trip.plan, trip.route
     consumed = plan.initial_fuel + plan.total_gallons - plan.remaining_fuel
-    line = LineString(route.coordinates, srid=4326).simplify(SIMPLIFY_TOLERANCE_DEGREES, preserve_topology=True)
+    # Parsing GeoJSON builds the line in one GEOS call; LineString(coords) costs one call per point.
+    geojson = json.dumps({"type": "LineString", "coordinates": route.coordinates})
+    line = GEOSGeometry(geojson, srid=4326).simplify(SIMPLIFY_TOLERANCE_DEGREES, preserve_topology=True)
     return {
         "route": {
             "distance_miles": number(route.distance_miles, 1),
