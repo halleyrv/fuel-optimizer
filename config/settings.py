@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.gis",
     "rest_framework",
+    "drf_spectacular",
     "fuel_route",
 ]
 
@@ -51,6 +52,7 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "UNAUTHENTICATED_USER": None,
     "EXCEPTION_HANDLER": "fuel_route.api.presenters.api_exception_handler",
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 STATION_DATA_DIR = BASE_DIR / "data"
@@ -64,3 +66,10 @@ HTTP_USER_AGENT = "fuel-route-optimizer/0.1 (assessment demo)"
 # Corridor around the route: a station qualifies within base + its city radius (capped).
 CORRIDOR_BASE_METERS = float(os.environ.get("CORRIDOR_BASE_METERS", "5000"))
 CORRIDOR_RADIUS_CAP_METERS = float(os.environ.get("CORRIDOR_RADIUS_CAP_METERS", "10000"))
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Fuel Route Optimizer API",
+    "DESCRIPTION": "Cheapest fuel stops along a US driving route (500-mile range, 10 MPG).",
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+}

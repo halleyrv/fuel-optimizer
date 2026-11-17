@@ -20,22 +20,6 @@ STOP = FuelStop(7, D("5.04"), D("3.4567"), D("30.004"), D("103.71"))
 TRIP = TripPlan(ROUTE, FuelPlan([STOP], D(0), D(0)), [(STOP, STATION)])
 
 
-@pytest.fixture
-def planner(monkeypatch):
-    calls = []
-
-    def fake(start, finish, initial_fuel):
-        calls.append((start, finish, initial_fuel))
-        if isinstance(fake.result, Exception):
-            raise fake.result
-        return fake.result
-
-    fake.result = TRIP
-    monkeypatch.setattr("fuel_route.api.views.plan_trip_with_providers", fake)
-    fake.calls = calls
-    return fake
-
-
 def post(client, **body):
     return client.post(URL, {"start": "A, NE", "finish": "B, NE", **body}, content_type="application/json")
 
