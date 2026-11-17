@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from django.conf import settings
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 
 from fuel_route.application.import_stations import geocode_stations
 from fuel_route.infrastructure.csv_source import read_station_csv
@@ -23,6 +23,8 @@ class Command(BaseCommand):
         # Places first: a city beats the county subdivision that shares its name.
         geocoders = [load_gazetteer(Path(places)), load_gazetteer(Path(cousubs))]
         result = geocode_stations(read_station_csv(Path(csv)), geocoders)
+        if not result.located:
+            raise CommandError(f"No stations located ({dict(result.excluded)}); existing data left unchanged")
         count = replace_all_stations(result.located)
 
         self.stdout.write(self.style.SUCCESS(f"Imported {count} stations"))

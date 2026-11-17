@@ -3,7 +3,7 @@ import zipfile
 from decimal import Decimal
 
 import pytest
-from django.core.management import call_command
+from django.core.management import CommandError, call_command
 
 from fuel_route.models import FuelStation
 
@@ -57,5 +57,17 @@ def test_import_stores_located_stations_and_reports_exclusions(files):
 def test_import_is_idempotent(files):
     call_command("import_stations", **files, stdout=io.StringIO())
     call_command("import_stations", **files, stdout=io.StringIO())
+
+    assert FuelStation.objects.count() == 2
+
+
+@pytest.mark.django_db
+def test_import_that_locates_nothing_keeps_existing_stations(files, tmp_path):
+    call_command("import_stations", **files, stdout=io.StringIO())
+    empty = tmp_path / "empty.csv"
+    empty.write_text(CSV.splitlines()[0] + "\n")
+
+    with pytest.raises(CommandError, match="left unchanged"):
+        call_command("import_stations", **{**files, "csv": str(empty)}, stdout=io.StringIO())
 
     assert FuelStation.objects.count() == 2
