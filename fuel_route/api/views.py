@@ -1,10 +1,11 @@
 from typing import Any
 from urllib.parse import urlencode
 
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
+from django.http import HttpRequest
 from django.urls import reverse
+from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
+from rest_framework.renderers import TemplateHTMLRenderer
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -57,7 +58,30 @@ class OptimizeRouteView(APIView):
         return Response(body, status=status)
 
 
-def route_map(request: HttpRequest) -> HttpResponse:
-    status, body = _plan(request, request.GET)
-    context = {"trip": body if status == 200 else None, "error": body}
-    return render(request, "fuel_route/map.html", context, status=status)
+_HTML_ERROR = OpenApiResponse(OpenApiTypes.STR, description="HTML page explaining the error (same codes as the JSON endpoint).")
+
+
+class RouteMapView(APIView):
+    renderer_classes = [TemplateHTMLRenderer]
+
+    @extend_schema(
+        summary="Show the planned trip on a map (HTML)",
+        description=(
+            "Same inputs and plan as `POST /api/v1/routes/optimize/`, rendered as an HTML page: the route, "
+            "a marker per fuel stop and a table of purchases. Open it in a browser, for example "
+            "`/api/v1/routes/map/?start=Chicago%2C+IL&finish=Denver%2C+CO`. Every JSON response links here "
+            "through `map_url`."
+        ),
+        parameters=[TripRequestSerializer],
+        responses={
+            (200, "text/html"): OpenApiResponse(OpenApiTypes.STR, description="HTML page with the route map."),
+            (400, "text/html"): _HTML_ERROR,
+            (404, "text/html"): _HTML_ERROR,
+            (422, "text/html"): _HTML_ERROR,
+            (502, "text/html"): _HTML_ERROR,
+        },
+    )
+    def get(self, request: Request) -> Response:
+        status, body = _plan(request, request.query_params)
+        context = {"trip": body if status == 200 else None, "error": body}
+        return Response(context, status=status, template_name="fuel_route/map.html")

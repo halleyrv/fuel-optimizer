@@ -12,7 +12,7 @@ The schema is the source of truth. `tests/api/test_docs.py` validates it without
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/api/v1/routes/optimize/` | Route, cheapest fuel stops, total fuel cost and a `map_url`. |
-| GET | `/api/v1/routes/map/` | HTML map of the same plan (`start`, `finish`, `initial_fuel_gallons` as query parameters). Not part of the OpenAPI schema because it returns HTML. |
+| GET | `/api/v1/routes/map/` | HTML map of the same plan (`start`, `finish`, `initial_fuel_gallons` as query parameters). Documented in the schema with `text/html` responses; open it in a browser to see the map. |
 
 ## Conventions
 
