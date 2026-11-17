@@ -12,7 +12,7 @@ uv run mutmut show <id> # shows the mutation
 
 ## Latest run
 
-207 mutants, 204 killed, 3 surviving (all equivalent, listed below).
+223 mutants, 220 killed, 3 surviving (all equivalent, listed below).
 
 ## Accepted equivalent mutants
 

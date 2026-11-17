@@ -52,8 +52,7 @@ class PlaceIndex:
 
 def parse_city_state(text: str) -> tuple[str, str] | None:
     """Parse "City, ST" (US state code). Anything else returns None."""
-    city, _, state = text.rpartition(",")
-    city, state = city.strip(), state.strip().upper()
-    if not city or "," in city or not is_us_state(state):
+    parts = [part.strip() for part in text.split(",")]
+    if len(parts) != 2 or not parts[0] or not is_us_state(parts[1].upper()):
         return None
-    return city, state
+    return parts[0], parts[1].upper()

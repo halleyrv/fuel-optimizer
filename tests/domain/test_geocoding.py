@@ -88,3 +88,5 @@ def test_parse_city_state_rejects_other_formats():
     assert parse_city_state("New York") is None
     assert parse_city_state("Toronto, ON") is None
     assert parse_city_state("1600 Pennsylvania Ave, Washington, DC 20500") is None
+    assert parse_city_state("Paris, Lamar County, TX") is None
+    assert parse_city_state(" , TX") is None
