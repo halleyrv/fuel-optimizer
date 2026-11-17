@@ -12,6 +12,7 @@ from enum import StrEnum
 from itertools import takewhile
 
 CENT = Decimal("0.01")
+ORIGIN_WINDOW_MILES = Decimal(15)  # stations this close to the start allow departing on an empty tank
 ZERO = Decimal(0)
 
 
@@ -76,7 +77,7 @@ def plan_fuel(
     stations: Sequence[StationOnRoute],
     vehicle: Vehicle,
     initial_fuel: Decimal = ZERO,
-    origin_window_miles: Decimal = Decimal(15),
+    origin_window_miles: Decimal = ORIGIN_WINDOW_MILES,
 ) -> FuelPlan:
     if not ZERO <= initial_fuel <= vehicle.tank_gallons:
         raise ValueError("initial_fuel must be between 0 and the tank capacity")

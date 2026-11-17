@@ -7,7 +7,7 @@ from django.contrib.gis.geos import LineString
 from rest_framework.views import exception_handler
 
 from fuel_route.application.plan_trip import ExternalServiceError, LocationNotFound, RouteNotFound, TripPlan
-from fuel_route.domain.optimizer import InfeasibleRoute
+from fuel_route.domain.optimizer import ORIGIN_WINDOW_MILES, InfeasibleReason, InfeasibleRoute, Vehicle
 
 TRIP_ERRORS = (LocationNotFound, RouteNotFound, InfeasibleRoute, ExternalServiceError)
 SIMPLIFY_TOLERANCE_DEGREES = 0.0005  # about 50 m; keeps a cross-country route in a few thousand points
@@ -56,6 +56,20 @@ def trip_to_dict(trip: TripPlan, map_url: str) -> dict[str, Any]:
     }
 
 
+def _infeasible_detail(error: InfeasibleRoute) -> str:
+    """Say why the trip cannot be done and what the client can change."""
+    if error.reason == InfeasibleReason.NO_STATION_NEAR_ORIGIN:
+        return (
+            f"No fuel station in the supplied price list within {ORIGIN_WINDOW_MILES} miles of the start, "
+            "so the trip cannot begin on an empty tank. Set initial_fuel_gallons to depart with fuel."
+        )
+    vehicle_range = Vehicle().tank_gallons * Vehicle().mpg
+    return (
+        f"A stretch of the route longer than {vehicle_range} miles has no fuel station "
+        f"(from mile {number(error.at_mile, 1):,.1f}), so the destination cannot be reached."
+    )
+
+
 def error_to_dict(error: Exception) -> tuple[int, dict[str, Any]]:
     match error:
         case LocationNotFound():
@@ -63,9 +77,7 @@ def error_to_dict(error: Exception) -> tuple[int, dict[str, Any]]:
         case RouteNotFound():
             return 422, {"error": "route_not_found", "detail": f"No drivable route: {error}"}
         case InfeasibleRoute():
-            at_mile = number(error.at_mile, 1)
-            detail = f"The destination cannot be reached with a 500-mile range ({error.reason} at mile {at_mile})."
-            return 422, {"error": str(error.reason), "detail": detail, "at_mile": at_mile}
+            return 422, {"error": str(error.reason), "detail": _infeasible_detail(error), "at_mile": number(error.at_mile, 1)}
         case _:
             return 502, {"error": "external_service_error", "detail": str(error)}
 

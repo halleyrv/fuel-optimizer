@@ -122,3 +122,13 @@ def test_malformed_json_uses_the_same_error_shape(client, planner):
     assert response.status_code == 400
     assert response.json()["error"] == "invalid_request"
     assert "JSON" in response.json()["detail"]
+
+
+def test_infeasible_errors_explain_the_cause_and_the_fix(client, planner):
+    planner.result = InfeasibleRoute(InfeasibleReason.NO_STATION_NEAR_ORIGIN, D(0))
+    no_station = post(client).json()["detail"]
+    planner.result = InfeasibleRoute(InfeasibleReason.GAP_EXCEEDS_RANGE, D("1200.04"))
+    gap = post(client).json()["detail"]
+
+    assert "within 15 miles of the start" in no_station and "initial_fuel_gallons" in no_station
+    assert "longer than 500 miles" in gap and "mile 1,200.0" in gap
