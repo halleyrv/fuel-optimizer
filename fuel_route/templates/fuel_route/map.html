@@ -81,6 +81,17 @@
     .figure dd { margin: 4px 0 0; font: 600 24px var(--mono); }
     .figure.cost { background: var(--sign); border-color: var(--sign); color: #fff; }
     .figure.cost dt { color: #cfe6dc; }
+    .figure dt { display: flex; align-items: center; gap: 6px; }
+
+    .icon { width: 16px; height: 16px; flex: none; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .figure .icon { color: var(--sign); }
+    .figure.cost .icon { color: #fff; }
+
+    .popup { font: 400 14px/1.4 var(--display); color: var(--ink); min-width: 210px; }
+    .popup h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; font-size: 15px; font-weight: 800; }
+    .popup p { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+    .popup .icon { color: var(--sign); }
+    .popup .total { font-weight: 800; }
 
     .layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 20px; align-items: start; }
     #map { height: 600px; border-radius: 8px; border: 1px solid var(--line); position: sticky; top: 16px; }
@@ -125,6 +136,16 @@
   </style>
 </head>
 <body>
+  <!-- Line icons in the highway-sign style, drawn once and reused with <use>. -->
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-road" viewBox="0 0 24 24"><path d="M6 21 9.5 3M18 21 14.5 3M12 5v2.5M12 11v2.5M12 17v2.5"/></symbol>
+      <symbol id="i-pump" viewBox="0 0 24 24"><path d="M4 21V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v16M3 21h12M7 8h4M14 10h2a2 2 0 0 1 2 2v4a1.5 1.5 0 0 0 3 0V9l-3-3"/></symbol>
+      <symbol id="i-can" viewBox="0 0 24 24"><path d="M6 8h8.5L18 11.5V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1zM9 8V4.5h4V8M9.5 12.5l5 5M14.5 12.5l-5 5"/></symbol>
+      <symbol id="i-cash" viewBox="0 0 24 24"><path d="M3 7h18v10H3zM12 9.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5M6 10v4M18 10v4"/></symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.7-6.5-10.5a6.5 6.5 0 0 1 13 0C18.5 15.3 12 21 12 21zM12 8a2.5 2.5 0 1 0 0 5 2.5 2.5 0 1 0 0-5"/></symbol>
+    </defs>
+  </svg>
   <!-- Demo client of the API: every figure below comes from POST /api/v1/routes/optimize/. -->
   <header class="bar">
     <div class="brand">
@@ -156,10 +177,10 @@
     <p id="status" class="status" role="status" aria-live="polite">Enter a start and finish to plan the cheapest fuel stops.</p>
     <section id="result" hidden>
       <dl class="figures">
-        <div class="figure"><dt>Distance</dt><dd id="distance"></dd></div>
-        <div class="figure"><dt>Fuel stops</dt><dd id="stop-count"></dd></div>
-        <div class="figure"><dt>Gallons bought</dt><dd id="gallons"></dd></div>
-        <div class="figure cost"><dt>Fuel cost</dt><dd id="cost"></dd></div>
+        <div class="figure"><dt><svg class="icon"><use href="#i-road"/></svg>Distance</dt><dd id="distance"></dd></div>
+        <div class="figure"><dt><svg class="icon"><use href="#i-pump"/></svg>Fuel stops</dt><dd id="stop-count"></dd></div>
+        <div class="figure"><dt><svg class="icon"><use href="#i-can"/></svg>Gallons bought</dt><dd id="gallons"></dd></div>
+        <div class="figure cost"><dt><svg class="icon"><use href="#i-cash"/></svg>Fuel cost</dt><dd id="cost"></dd></div>
       </dl>
       <div class="layout">
         <div id="map" role="img" aria-label="Route map with numbered fuel stops"></div>
@@ -295,6 +316,37 @@
       return element;
     }
 
+    function svgIcon(name) {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("class", "icon");
+      svg.setAttribute("aria-hidden", "true");
+      const use = document.createElementNS("http://www.w3.org/2000/svg", "use");
+      use.setAttribute("href", "#i-" + name);
+      svg.append(use);
+      return svg;
+    }
+
+    // Popup: one line per kind of fact, each with its icon. API text is inserted as text, never HTML.
+    function stopPopup(stop, label) {
+      const box = document.createElement("div");
+      box.className = "popup";
+      const title = document.createElement("h3");
+      title.append(plate(label), stop.name);
+      const line = (iconName, text, className) => {
+        const p = document.createElement("p");
+        if (className) p.className = className;
+        p.append(svgIcon(iconName), text);
+        return p;
+      };
+      box.append(
+        title,
+        line("pin", stop.city + ", " + stop.state + " · mile " + number(stop.mile, 1)),
+        line("can", number(stop.gallons, 2) + " gal × $" + number(stop.price_per_gallon, 3) + " per gal"),
+        line("cash", money(stop.cost), "total"),
+      );
+      return box;
+    }
+
     function addCell(row, content, className) {
       const cell = row.insertCell();
       if (className) cell.className = className;
@@ -350,10 +402,7 @@
       trip.fuel_stops.forEach((stop, index) => {
         const [lon, lat] = stop.location.coordinates;
         const icon = L.divIcon({ className: "stop-pin", html: plate(index + 1), iconSize: [30, 30], iconAnchor: [15, 15] });
-        const popup = document.createElement("div");
-        popup.innerText = `${index + 1}. ${stop.name}\n${stop.city}, ${stop.state} · mile ${number(stop.mile, 1)}\n` +
-          `${number(stop.gallons, 2)} gal × $${number(stop.price_per_gallon, 3)} = ${money(stop.cost)}`;
-        L.marker([lat, lon], { icon }).addTo(map).bindPopup(popup);
+        L.marker([lat, lon], { icon }).addTo(map).bindPopup(stopPopup(stop, index + 1));
       });
     }
 
