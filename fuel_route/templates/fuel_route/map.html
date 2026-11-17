@@ -173,7 +173,7 @@
           <ul class="options" id="finish-options" role="listbox" hidden></ul>
         </span>
       </label>
-      <label>Fuel on board (gal) <input name="initial_fuel_gallons" type="number" min="0" max="50" step="0.1" value="0"></label>
+      <label>Fuel on board (gal) <input name="initial_fuel_gallons" type="number" min="0" max="{{ tank_gallons }}" step="0.1" value="0"></label>
       <button type="submit">Plan route</button>
       <p class="hint">Pick a suggestion or type any US place. "City, ST" gives the most precise result.</p>
     </form>
@@ -414,14 +414,14 @@
       });
     }
 
-    // The start has no station nearby: offer the same trip departing with a full tank (50 gal).
+    // The start has no station nearby: offer the same trip departing with a full tank (the field's max).
     function offerFullTank() {
       const retry = document.createElement("button");
       retry.type = "button";
       retry.className = "retry";
       retry.textContent = "Retry with a full tank";
       retry.addEventListener("click", () => {
-        params.set("initial_fuel_gallons", "50");
+        params.set("initial_fuel_gallons", form.elements.initial_fuel_gallons.max);
         window.location.search = params.toString();
       });
       statusBox.append(retry);

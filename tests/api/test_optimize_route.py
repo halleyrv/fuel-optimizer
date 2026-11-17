@@ -10,7 +10,8 @@ from fuel_route.application.plan_trip import (
     RouteNotFound,
     TripPlan,
 )
-from fuel_route.domain.optimizer import FuelPlan, FuelStop, InfeasibleReason, InfeasibleRoute
+from fuel_route.api.serializers import TripRequestSerializer
+from fuel_route.domain.optimizer import FuelPlan, FuelStop, InfeasibleReason, InfeasibleRoute, Vehicle
 
 D = Decimal
 URL = "/api/v1/routes/optimize/"
@@ -110,6 +111,13 @@ def test_demo_page_is_a_client_of_the_api_and_plans_nothing_itself(client, plann
     assert 'fetch("/api/v1/routes/optimize/"' in html
     assert "leaflet" in html
     assert planner.calls == []
+
+
+def test_tank_size_comes_from_the_domain_vehicle(client, planner):
+    tank = Vehicle().tank_gallons
+
+    assert TripRequestSerializer().fields["initial_fuel_gallons"].max_value == tank
+    assert f'name="initial_fuel_gallons" type="number" min="0" max="{tank}"' in client.get("/map/").content.decode()
 
 
 def test_map_moved_out_of_the_api_namespace(client, planner):
