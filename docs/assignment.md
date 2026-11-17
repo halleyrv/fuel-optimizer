@@ -14,11 +14,4 @@ Requirements:
 - The API should return results quickly, the quicker the better
 - The API shouldn't need to call the free map/routing API you found too much. One call to the map/route API is ideal, two or three is acceptable
 - Make a Loom where you use Postman or similar API platform to demonstrate the API working while also giving a quick overview of your code (5 minutes max)
-- Share the Github code with us  
-  
-After completing, please attach the Github code and a Loom video in the question in this message.  
-  
-Candidates who successfully complete the coding assessment and demonstrate a high level of quality may be invited to an additional evaluation stage before the final interview.  
-  
-Approximately **4% of candidates who complete the coding assessment advance to the interview stage.**  
-Candidates selected to advance to the final interview stage will receive a **$100 bonus** in recognition of the quality of their work and their progress in our hiring process.  
+- Share the Github code with us
