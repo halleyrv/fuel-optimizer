@@ -24,7 +24,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - [x] T1 S6 S8: scaffold (Django 6.1, DRF, PostGIS, Docker) + station import with Gazetteer geocoding — inline — see commit `feat(stations)`
 - [ ] T2 S6: Nominatim fallback for unmatched cities, cached in `data/geocode_cache.json` — inline
 - [x] T3 S3 S4 S10 S11: fuel optimizer (pure domain, TDD) — inline — branch feat/fuel-optimizer
-- [ ] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline
+- [x] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline — branch feat/route-planning (2d3209f, f91d624, 1618472, refactor + feat(trip))
 - [ ] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline
 - [ ] T6: README, Loom script — inline
 - [ ] T7 S12: refactor `plan_fuel` with guard clauses (origin out of the loop, extract `_next_stop` and `_buy`), no interfaces or Strategy; tests green incl. DP cross-check and mutmut; one commit per step — inline, after T6
@@ -40,3 +40,5 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L7: T3 done. `fuel_route/domain/optimizer.py`; 11 tests incl. exhaustive DP cross-check on 200 random routes (141 feasible, 126 multi-stop) — all match. RED observed (module missing) before implementation.
 - L8: Antigravity review (agy -p --mode plan, docs/review-guidelines.md) of main..feat/fuel-optimizer: 4 findings, all confirmed and fixed with RED tests: origin-window range bug (blocker), import wiping data on empty result (blocker), domain-rules 4.1 wording (advisory), __MACOSX zip entries (advisory). 42 tests pass. Note: headless agy denies shell commands; pass a pre-generated diff via --add-dir.
 - L9: Mutation testing (mutmut 3.8.1, domain only): first run 189/207 killed; after new tests 204/207, 3 equivalent documented in docs/mutation-testing.md. Rule added to AGENTS.md. 47 tests pass.
+- L10: T4 done. OSRM verified live: NoRoute returns HTTP 400 with JSON body (handled). Corridor NY→LA: 349 stations in 0.43 s. End to end NY→LA: 2,810 mi, 281 gal, $857.34, 19 stops, 3.2 s, 1 OSRM call. Dataset limitation: only 16 CA rows (Imperial Valley), last station before LA is Las Vegas area (~235 mi, within range). mutmut 220/223 (3 documented equivalents). 66 tests pass.
+- L11: Open question for the user: the optimal plan has many tiny purchases (0.9 gal, 1.1 gal) and 19 stops; cost-optimal but impractical. Options: a minimum purchase or a per-stop cost. Not implemented without a decision.
