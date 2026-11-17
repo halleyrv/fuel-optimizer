@@ -45,3 +45,4 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L11: Open question for the user: the optimal plan has many tiny purchases (0.9 gal, 1.1 gal) and 19 stops; cost-optimal but impractical. Options: a minimum purchase or a per-stop cost. Not implemented without a decision.
 - L12: L11 resolved by S13 (documented in domain-rules "Known trade-off: number of stops").
 - L13: T5 done. POST /api/v1/routes/optimize/ + GET /api/v1/routes/map/ (Leaflet). Live: NY→LA 200, 61 KB, 3.6 s cold, 0.73 s cached; 404 and 400 verified live. "Atlantis, ZZ" resolves via Nominatim to Atlantis, FL (real city). 81 tests pass.
+- L14: Antigravity review #2 (2f05265..cf83a32): 2 findings. Blocker "ST_LineLocatePoint NULL on zero-length route" DISMISSED: live start=finish (Effingham, IL) returns 200, and PostGIS returns 0 (not NULL) for a zero-length line. Advisory "Nominatim payload KeyError -> 500" CONFIRMED and fixed with RED test. 83 tests pass.
