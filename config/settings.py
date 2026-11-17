@@ -46,3 +46,9 @@ REST_FRAMEWORK = {
 }
 
 STATION_DATA_DIR = BASE_DIR / "data"
+
+# External providers (free, no API key). One OSRM call per request; Nominatim only as fallback.
+OSRM_URL = os.environ.get("OSRM_URL", "https://router.project-osrm.org")
+NOMINATIM_URL = os.environ.get("NOMINATIM_URL", "https://nominatim.openstreetmap.org")
+EXTERNAL_TIMEOUT_SECONDS = float(os.environ.get("EXTERNAL_TIMEOUT_SECONDS", "10"))
+HTTP_USER_AGENT = "fuel-route-optimizer/0.1 (assessment demo)"

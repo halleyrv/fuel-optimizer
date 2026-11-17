@@ -1,4 +1,4 @@
-from fuel_route.domain.geocoding import Place, PlaceIndex, is_us_state, normalize_city
+from fuel_route.domain.geocoding import Place, PlaceIndex, is_us_state, normalize_city, parse_city_state
 
 PLACE = Place(latitude=38.6, longitude=-90.2, radius_m=1000.0)
 
@@ -77,3 +77,14 @@ def test_first_place_wins_when_two_places_tie_on_size():
     index.add("Springfield", "IL", twin)
 
     assert index.locate("Springfield", "IL") == PLACE
+
+
+def test_parse_city_state_accepts_city_comma_state():
+    assert parse_city_state("New York, NY") == ("New York", "NY")
+    assert parse_city_state("  winston-salem ,nc ") == ("winston-salem", "NC")
+
+
+def test_parse_city_state_rejects_other_formats():
+    assert parse_city_state("New York") is None
+    assert parse_city_state("Toronto, ON") is None
+    assert parse_city_state("1600 Pennsylvania Ave, Washington, DC 20500") is None

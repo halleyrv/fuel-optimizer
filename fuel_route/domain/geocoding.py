@@ -48,3 +48,12 @@ class PlaceIndex:
     def locate(self, city: str, state: str) -> Place | None:
         found = self._places.get(_key(city, state))
         return found[1] if found else None
+
+
+def parse_city_state(text: str) -> tuple[str, str] | None:
+    """Parse "City, ST" (US state code). Anything else returns None."""
+    city, _, state = text.rpartition(",")
+    city, state = city.strip(), state.strip().upper()
+    if not city or "," in city or not is_us_state(state):
+        return None
+    return city, state
