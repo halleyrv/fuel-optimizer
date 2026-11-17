@@ -1,8 +1,3 @@
-Thank you for applying for the position Backend Django Engineer.  
-Congratulations on successfully passing our initial screening!
-
-As the next step in our hiring process, we kindly ask you to complete the following coding assessment:
-
 Assignment:
 
 - Build an API that takes inputs of start and finish location both within the USA
@@ -27,7 +22,3 @@ Candidates who successfully complete the coding assessment and demonstrate a hig
   
 Approximately **4% of candidates who complete the coding assessment advance to the interview stage.**  
 Candidates selected to advance to the final interview stage will receive a **$100 bonus** in recognition of the quality of their work and their progress in our hiring process.  
-  
---  
-Ena  
-Spotter
