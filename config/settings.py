@@ -23,6 +23,13 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = ["django.middleware.common.CommonMiddleware"]
 ROOT_URLCONF = "config.urls"
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "APP_DIRS": True,
+        "OPTIONS": {"context_processors": ["django.template.context_processors.request"]},
+    }
+]
 WSGI_APPLICATION = "config.wsgi.application"
 
 DATABASES = {
@@ -43,6 +50,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [],
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
     "UNAUTHENTICATED_USER": None,
+    "EXCEPTION_HANDLER": "fuel_route.api.presenters.api_exception_handler",
 }
 
 STATION_DATA_DIR = BASE_DIR / "data"

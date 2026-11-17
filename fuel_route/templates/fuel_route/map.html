@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fuel Route Map</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    #map { height: 75vh; }
+    .panel { padding: 12px 16px; }
+    table { border-collapse: collapse; width: 100%; font-size: 14px; }
+    th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #ddd; }
+    .error { color: #b00020; }
+  </style>
+</head>
+<body>
+{% if trip %}
+  <div id="map"></div>
+  <div class="panel">
+    <strong>{{ trip.summary.distance_miles }} mi</strong> ·
+    {{ trip.summary.number_of_stops }} stops ·
+    {{ trip.summary.total_gallons_purchased }} gal purchased ·
+    <strong>${{ trip.summary.total_fuel_cost }}</strong> total fuel cost
+    <p><small>Station positions are city-level approximations.</small></p>
+    <table>
+      <tr><th>Mile</th><th>Station</th><th>City</th><th>$/gal</th><th>Gallons</th><th>Cost</th></tr>
+      {% for stop in trip.fuel_stops %}
+      <tr><td>{{ stop.mile }}</td><td>{{ stop.name }}</td><td>{{ stop.city }}, {{ stop.state }}</td><td>{{ stop.price_per_gallon }}</td><td>{{ stop.gallons }}</td><td>${{ stop.cost }}</td></tr>
+      {% endfor %}
+    </table>
+  </div>
+  {{ trip|json_script:"trip-data" }}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const trip = JSON.parse(document.getElementById("trip-data").textContent);
+    const map = L.map("map");
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18, attribution: "&copy; OpenStreetMap contributors"
+    }).addTo(map);
+    const route = L.geoJSON(trip.route.geometry, { style: { color: "#1565c0", weight: 4 } }).addTo(map);
+    trip.fuel_stops.forEach((stop) => {
+      const [lon, lat] = stop.location.coordinates;
+      const popup = document.createElement("div");
+      popup.innerText = `${stop.name}\n${stop.city}, ${stop.state}\nMile ${stop.mile}\n` +
+        `${stop.gallons} gal x $${stop.price_per_gallon} = $${stop.cost}`;
+      L.marker([lat, lon]).addTo(map).bindPopup(popup);
+    });
+    map.fitBounds(route.getBounds());
+  </script>
+{% else %}
+  <div class="panel error"><h1>Route could not be planned</h1><p>{{ error.detail }}</p></div>
+{% endif %}
+</body>
+</html>
