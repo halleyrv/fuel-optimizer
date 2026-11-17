@@ -17,6 +17,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - S10 (decision 5): "Mantener la regla actual de `domain-rules.md`: buscar la siguiente estación alcanzable con un precio inferior." / "Respetar siempre las 500 millas de autonomía."
 - S11 (user, 2026-11-16): initial fuel. User: "sí, me cierra, arrancá con el optimizador y Y si es necesario documentarlo en algún lado, un supuesto esto también para poder explicarlo." Agreed model: default 0 gallons, departure fill-up at stations within the first 15 miles; optional `initial_fuel_gallons` (0–50) not charged; no station near origin → infeasible.
 - S12 (user, 2026-11-17, future refactor): "Después refactorizá plan_fuel en optimizer.py con guard clauses: sacá el origen del loop, extraé _next_stop y _buy, sin interfaces ni Strategy. Mantené los tests en verde (incluido el de la búsqueda exhaustiva) y hacé un commit separado para cada cosa."
+- S13 (user, 2026-11-17): "dale, documentalo así y seguí con T5" — keep the cost-optimal greedy; document the many-small-stops trade-off and the DP + per-stop cost alternative.
 
 ## Tasks
 
@@ -42,3 +43,4 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L9: Mutation testing (mutmut 3.8.1, domain only): first run 189/207 killed; after new tests 204/207, 3 equivalent documented in docs/mutation-testing.md. Rule added to AGENTS.md. 47 tests pass.
 - L10: T4 done. OSRM verified live: NoRoute returns HTTP 400 with JSON body (handled). Corridor NY→LA: 349 stations in 0.43 s. End to end NY→LA: 2,810 mi, 281 gal, $857.34, 19 stops, 3.2 s, 1 OSRM call. Dataset limitation: only 16 CA rows (Imperial Valley), last station before LA is Las Vegas area (~235 mi, within range). mutmut 220/223 (3 documented equivalents). 66 tests pass.
 - L11: Open question for the user: the optimal plan has many tiny purchases (0.9 gal, 1.1 gal) and 19 stops; cost-optimal but impractical. Options: a minimum purchase or a per-stop cost. Not implemented without a decision.
+- L12: L11 resolved by S13 (documented in domain-rules "Known trade-off: number of stops").

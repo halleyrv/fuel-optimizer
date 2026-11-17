@@ -57,6 +57,10 @@ Use a greedy refueling strategy:
 
 The algorithm is verified against an exhaustive dynamic-programming search on 200 random routes (`tests/domain/test_optimizer.py`).
 
+### Known trade-off: number of stops
+
+The plan minimizes fuel cost only, so it can include small top-ups at nearby stations (for example 0.9 gallons, then 4 gallons one mile later). This is cost-optimal but not how a driver would refuel. A minimum purchase or a per-stop cost (driver time) would fix it, but either one breaks the greedy optimality guarantee; the correct solution is dynamic programming over stations and fuel levels. For this assessment we keep the provably optimal greedy and report the trade-off openly.
+
 The optimizer must account for initial fuel, station positions, fuel prices, and destination distance.
 
 ## 5. Cost and Consumption
