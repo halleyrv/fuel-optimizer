@@ -6,6 +6,10 @@ A Django REST API that takes a start and finish anywhere in the USA and returns 
 New York, NY → Los Angeles, CA: 2,810 mi · 19 stops · 281 gal · $857.34 · 1 routing call
 ```
 
+![Demo page at /map/ planning Chicago, IL to Denver, CO with 10 gallons on board: 8 fuel stops, $268.60](docs/images/demo-map.png)
+
+*The demo page at `/map/` is a plain client of `POST /api/v1/routes/optimize/`: it draws the returned route, stops and costs.*
+
 ## Quick start
 
 Requires Docker.
