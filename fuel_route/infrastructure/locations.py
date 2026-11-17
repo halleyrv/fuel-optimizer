@@ -40,9 +40,10 @@ class NominatimResolver:
         if cached is None:
             params = urlencode({"q": query, "format": "jsonv2", "countrycodes": "us", "limit": 1})
             results = get_json("nominatim", f"{settings.NOMINATIM_URL}/search?{params}")
-            if not isinstance(results, list):
-                raise ExternalServiceError(f"nominatim returned an unexpected response: {results!r}")
-            cached = (float(results[0]["lat"]), float(results[0]["lon"])) if results else _NOT_FOUND
+            try:
+                cached = (float(results[0]["lat"]), float(results[0]["lon"])) if results else _NOT_FOUND
+            except (KeyError, TypeError, ValueError) as error:
+                raise ExternalServiceError(f"nominatim returned an unexpected response: {results!r}") from error
             django_cache.set(key, cached, timeout=None)
         return None if cached == _NOT_FOUND else Place(cached[0], cached[1], 0.0)
 

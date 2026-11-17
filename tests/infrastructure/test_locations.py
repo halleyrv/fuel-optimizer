@@ -64,6 +64,7 @@ def test_nominatim_http_error_is_reported_as_external_error():
         NominatimResolver().resolve("Somewhere")
 
 
-def test_nominatim_unexpected_payload_is_reported_as_external_error():
-    with respond({"error": "unexpected"}), pytest.raises(ExternalServiceError, match="nominatim"):
+@pytest.mark.parametrize("payload", [{"error": "unexpected"}, [{"display_name": "no coordinates"}], [{"lat": "north", "lon": "1"}]])
+def test_nominatim_unexpected_payload_is_reported_as_external_error(payload):
+    with respond(payload), pytest.raises(ExternalServiceError, match="nominatim"):
         NominatimResolver().resolve("Somewhere")
