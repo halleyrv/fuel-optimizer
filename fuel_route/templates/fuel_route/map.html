@@ -54,6 +54,18 @@
     .trip button:disabled { opacity: 0.7; cursor: progress; }
     .hint { grid-column: 1 / -1; margin: 0; color: #8d999f; font-size: 13px; }
 
+    /* City suggestions: a styled list under the field, identical in every browser. */
+    .combo { position: relative; display: block; }
+    .options {
+      position: absolute; z-index: 1000; top: calc(100% + 4px); left: 0; right: 0; margin: 0; padding: 4px 0;
+      list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25); max-height: 280px; overflow-y: auto;
+      text-transform: none; letter-spacing: normal;
+    }
+    .options li { padding: 8px 12px; color: var(--ink); font: 400 15px var(--display); cursor: pointer; }
+    .options li[aria-selected="true"], .options li:hover { background: #e7f2ed; color: var(--sign-dark); }
+    .options mark { background: none; color: inherit; font-weight: 800; }
+
     main { max-width: 1280px; margin: 0 auto; padding: 24px; }
     .status { margin: 0 0 20px; color: var(--muted); }
     .status.error { color: var(--error); background: #fdf0ee; border-left: 4px solid var(--error); padding: 12px 16px; border-radius: 4px; }
@@ -120,13 +132,24 @@
       <p>Cheapest fuel stops for a 500-mile range at 10 MPG</p>
     </div>
     <form class="trip" method="get" action="">
-      <label>Start <input name="start" list="cities" placeholder="Chicago, IL" autocomplete="off" required></label>
-      <label>Finish <input name="finish" list="cities" placeholder="Denver, CO" autocomplete="off" required></label>
+      <label>Start
+        <span class="combo">
+          <input name="start" placeholder="Chicago, IL" autocomplete="off" required
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="start-options">
+          <ul class="options" id="start-options" role="listbox" hidden></ul>
+        </span>
+      </label>
+      <label>Finish
+        <span class="combo">
+          <input name="finish" placeholder="Denver, CO" autocomplete="off" required
+                 role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="finish-options">
+          <ul class="options" id="finish-options" role="listbox" hidden></ul>
+        </span>
+      </label>
       <label>Fuel on board (gal) <input name="initial_fuel_gallons" type="number" min="0" max="50" step="0.1" value="0"></label>
       <button type="submit">Plan route</button>
       <p class="hint">Pick a suggestion or type any US place. "City, ST" gives the most precise result.</p>
     </form>
-    <datalist id="cities"></datalist>
   </header>
 
   <main>
@@ -171,10 +194,84 @@
       "San Francisco, CA", "San Jose, CA", "Seattle, WA", "St. Louis, MO", "Tampa, FL", "Tucson, AZ",
       "Tulsa, OK", "Washington, DC",
     ];
-    const datalist = document.getElementById("cities");
-    for (const city of CITIES) datalist.append(new Option(city));
+
+    // Combobox: cities that start with the text first, then cities that contain it. Free text stays valid.
+    function suggest(input) {
+      const list = document.getElementById(input.getAttribute("aria-controls"));
+      let active = -1;
+
+      function close() {
+        list.hidden = true;
+        input.setAttribute("aria-expanded", "false");
+        input.removeAttribute("aria-activedescendant");
+        active = -1;
+      }
+
+      function highlight(index) {
+        const items = list.children;
+        if (!items.length) return;
+        active = (index + items.length) % items.length;
+        for (const [i, item] of [...items].entries()) item.setAttribute("aria-selected", String(i === active));
+        input.setAttribute("aria-activedescendant", items[active].id);
+        items[active].scrollIntoView({ block: "nearest" });
+      }
+
+      function choose(city) {
+        input.value = city;
+        close();
+      }
+
+      function open() {
+        const query = input.value.trim().toLowerCase();
+        const starts = CITIES.filter((c) => c.toLowerCase().startsWith(query));
+        const contains = CITIES.filter((c) => !c.toLowerCase().startsWith(query) && c.toLowerCase().includes(query));
+        const matches = [...starts, ...contains].slice(0, 8);
+        list.replaceChildren();
+        if (!matches.length || (matches.length === 1 && matches[0].toLowerCase() === query)) return close();
+        matches.forEach((city, i) => {
+          const item = document.createElement("li");
+          item.id = `${list.id}-${i}`;
+          item.setAttribute("role", "option");
+          item.setAttribute("aria-selected", "false");
+          const at = city.toLowerCase().indexOf(query);
+          if (query && at >= 0) {
+            const mark = document.createElement("mark");
+            mark.textContent = city.slice(at, at + query.length);
+            item.append(city.slice(0, at), mark, city.slice(at + query.length));
+          } else {
+            item.textContent = city;
+          }
+          item.addEventListener("mousedown", (event) => {
+            event.preventDefault(); // keep focus in the input so blur does not close the list first
+            choose(city);
+          });
+          list.append(item);
+        });
+        list.hidden = false;
+        input.setAttribute("aria-expanded", "true");
+        active = -1;
+      }
+
+      input.addEventListener("input", open);
+      input.addEventListener("focus", open);
+      input.addEventListener("blur", close);
+      input.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          if (list.hidden) open();
+          highlight(active + (event.key === "ArrowDown" ? 1 : -1));
+        } else if (event.key === "Enter" && !list.hidden && active >= 0) {
+          event.preventDefault(); // pick the suggestion instead of submitting the form
+          choose(list.children[active].textContent);
+        } else if (event.key === "Escape") {
+          close();
+        }
+      });
+    }
 
     const form = document.querySelector("form");
+    suggest(form.elements.start);
+    suggest(form.elements.finish);
     const statusBox = document.getElementById("status");
     const params = new URLSearchParams(window.location.search);
     for (const field of ["start", "finish", "initial_fuel_gallons"]) {
