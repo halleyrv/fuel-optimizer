@@ -244,6 +244,8 @@
 
       function open() {
         const query = input.value.trim().toLowerCase();
+        // Suggest only after typing: a list on an empty field reads like the only valid choices.
+        if (!query) return close();
         const starts = CITIES.filter((c) => c.toLowerCase().startsWith(query));
         const contains = CITIES.filter((c) => !c.toLowerCase().startsWith(query) && c.toLowerCase().includes(query));
         const matches = [...starts, ...contains].slice(0, 8);
