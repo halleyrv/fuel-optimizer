@@ -125,8 +125,8 @@ The assignment leaves these open; each is a deliberate, documented decision ([`d
 
 | Check | Command | Result |
 |-------|---------|--------|
-| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 87 passing |
-| Mutation testing (domain) | `rm -rf mutants && uv run mutmut run` | 220 of 223 mutants killed; 3 equivalent, documented in [`docs/mutation-testing.md`](docs/mutation-testing.md) |
+| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 88 passing |
+| Mutation testing (domain) | `rm -rf mutants && uv run mutmut run` | 221 of 224 mutants detected; 3 equivalent, documented in [`docs/mutation-testing.md`](docs/mutation-testing.md) |
 | OpenAPI schema | `docker compose run --rm web python manage.py spectacular --validate --fail-on-warn` | valid, no warnings (also run in tests) |
 | External review | Antigravity, against [`docs/review-guidelines.md`](docs/review-guidelines.md) | 2 rounds; findings verified before fixing, 1 false positive dismissed with evidence |
 

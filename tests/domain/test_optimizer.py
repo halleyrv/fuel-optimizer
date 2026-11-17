@@ -172,3 +172,11 @@ def test_origin_window_station_keeps_its_real_position_for_range_checks():
     assert purchases(plan) == [(1, D(51), D("153.00")), (2, D(9), D("27.00"))]
     assert [(stop.mile, stop.price) for stop in plan.stops] == [(D(10), D("3.0")), (D(505), D("3.0"))]
     assert_fuel_balances(plan, "600")
+
+
+def test_arriving_with_exactly_the_needed_fuel_records_no_empty_stop():
+    stations = [station(1, "0", "3.0"), station(2, "100", "2.0")]
+
+    plan = plan_fuel(D(200), stations, TRUCK, initial_fuel=D(10))
+
+    assert purchases(plan) == [(2, D(10), D("20.00"))]

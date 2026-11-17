@@ -83,11 +83,7 @@ def plan_fuel(
 
     destination = _Point(route_miles, ZERO)
     on_route = sorted(
-        (
-            _Point(s.mile, s.price, s)
-            for s in stations
-            if ZERO <= s.mile <= route_miles
-        ),
+        (_Point(s.mile, s.price, s) for s in stations if ZERO <= s.mile <= route_miles),
         key=lambda p: (p.mile, p.price),
     )
     points = [*on_route, destination]
@@ -104,18 +100,9 @@ def plan_fuel(
     while points[i] is not destination:
         here = points[i]
         j, target = _next_stop(points, i, vehicle)
-        gallons = max(ZERO, target - fuel)  # fuel < 0 only after a departure-window arrival
-        if gallons > 0:
-            stops.append(
-                FuelStop(
-                    here.station.station_id,
-                    here.station.mile,
-                    here.price,
-                    gallons,
-                    (gallons * here.price).quantize(CENT),
-                )
-            )
-            fuel += gallons
+        if target > fuel:  # fuel < 0 only after a departure-window arrival
+            stops.append(_buy(here, target - fuel))
+            fuel = target
         fuel -= (points[j].mile - here.mile) / vehicle.mpg
         i = j
 
@@ -137,3 +124,8 @@ def _next_stop(points: list[_Point], i: int, vehicle: Vehicle) -> tuple[int, Dec
     if cheaper is not None:
         return cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
     return min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
+
+
+def _buy(here: _Point, gallons: Decimal) -> FuelStop:
+    station = here.station
+    return FuelStop(station.station_id, station.mile, here.price, gallons, (gallons * here.price).quantize(CENT))
