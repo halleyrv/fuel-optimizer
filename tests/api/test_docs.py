@@ -32,11 +32,8 @@ def test_documented_error_matches_the_real_error(client, planner):
     assert ErrorSerializer(data=body).is_valid()
 
 
-def test_map_page_is_documented_as_html_with_its_query_parameters(tmp_path):
+def test_schema_documents_only_the_json_api(tmp_path):
     call_command("spectacular", "--validate", "--fail-on-warn", "--file", str(tmp_path / "schema.yml"))
 
     schema = yaml.safe_load((tmp_path / "schema.yml").read_text())
-    operation = schema["paths"]["/api/v1/routes/map/"]["get"]
-    assert {p["name"] for p in operation["parameters"]} == {"start", "finish", "initial_fuel_gallons"}
-    assert set(operation["responses"]) == {"200", "400", "404", "422", "502"}
-    assert "text/html" in operation["responses"]["200"]["content"]
+    assert set(schema["paths"]) == {"/api/v1/routes/optimize/"}

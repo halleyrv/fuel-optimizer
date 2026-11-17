@@ -7,49 +7,114 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     body { margin: 0; font-family: system-ui, sans-serif; }
-    #map { height: 75vh; }
+    form { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; padding: 12px 16px; border-bottom: 1px solid #ddd; }
+    label { display: flex; flex-direction: column; font-size: 13px; gap: 2px; }
+    input { padding: 6px 8px; font-size: 14px; }
+    button { padding: 7px 14px; font-size: 14px; cursor: pointer; }
+    #map { height: 60vh; }
     .panel { padding: 12px 16px; }
     table { border-collapse: collapse; width: 100%; font-size: 14px; }
     th, td { text-align: left; padding: 4px 8px; border-bottom: 1px solid #ddd; }
     .error { color: #b00020; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
-{% if trip %}
-  <div id="map"></div>
-  <div class="panel">
-    <strong>{{ trip.summary.distance_miles }} mi</strong> ·
-    {{ trip.summary.number_of_stops }} stops ·
-    {{ trip.summary.total_gallons_purchased }} gal purchased ·
-    <strong>${{ trip.summary.total_fuel_cost }}</strong> total fuel cost
+  <!-- Demo client: everything below comes from POST /api/v1/routes/optimize/. -->
+  <form method="get" action="">
+    <label>Start <input name="start" placeholder="Chicago, IL" required></label>
+    <label>Finish <input name="finish" placeholder="Denver, CO" required></label>
+    <label>Initial fuel (gal) <input name="initial_fuel_gallons" type="number" min="0" max="50" step="0.1" value="0"></label>
+    <button type="submit">Plan route</button>
+    <small>Use "City, ST" for the most precise result.</small>
+  </form>
+  <div class="panel" id="status"></div>
+  <div id="map" hidden></div>
+  <div class="panel" id="result" hidden>
+    <p id="summary"></p>
     <p><small>Station positions are city-level approximations.</small></p>
     <table>
-      <tr><th>Mile</th><th>Station</th><th>City</th><th>$/gal</th><th>Gallons</th><th>Cost</th></tr>
-      {% for stop in trip.fuel_stops %}
-      <tr><td>{{ stop.mile }}</td><td>{{ stop.name }}</td><td>{{ stop.city }}, {{ stop.state }}</td><td>{{ stop.price_per_gallon }}</td><td>{{ stop.gallons }}</td><td>${{ stop.cost }}</td></tr>
-      {% endfor %}
+      <thead><tr><th>Mile</th><th>Station</th><th>City</th><th>$/gal</th><th>Gallons</th><th>Cost</th></tr></thead>
+      <tbody id="stops"></tbody>
     </table>
   </div>
-  {{ trip|json_script:"trip-data" }}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const trip = JSON.parse(document.getElementById("trip-data").textContent);
-    const map = L.map("map");
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18, attribution: "&copy; OpenStreetMap contributors"
-    }).addTo(map);
-    const route = L.geoJSON(trip.route.geometry, { style: { color: "#1565c0", weight: 4 } }).addTo(map);
-    trip.fuel_stops.forEach((stop) => {
-      const [lon, lat] = stop.location.coordinates;
-      const popup = document.createElement("div");
-      popup.innerText = `${stop.name}\n${stop.city}, ${stop.state}\nMile ${stop.mile}\n` +
-        `${stop.gallons} gal x $${stop.price_per_gallon} = $${stop.cost}`;
-      L.marker([lat, lon]).addTo(map).bindPopup(popup);
-    });
-    map.fitBounds(route.getBounds());
+    const form = document.querySelector("form");
+    const statusBox = document.getElementById("status");
+    const params = new URLSearchParams(window.location.search);
+    for (const field of ["start", "finish", "initial_fuel_gallons"]) {
+      if (params.has(field)) form.elements[field].value = params.get(field);
+    }
+
+    function showStatus(text, isError) {
+      statusBox.textContent = text;
+      statusBox.className = isError ? "panel error" : "panel";
+    }
+
+    function cell(row, text) {
+      row.insertCell().textContent = text;
+    }
+
+    function render(trip) {
+      const s = trip.summary;
+      document.getElementById("summary").textContent =
+        `${s.distance_miles} mi · ${s.number_of_stops} stops · ${s.total_gallons_purchased} gal purchased · ` +
+        `$${s.total_fuel_cost.toFixed(2)} total fuel cost`;
+      const tbody = document.getElementById("stops");
+      tbody.replaceChildren();
+      for (const stop of trip.fuel_stops) {
+        const row = tbody.insertRow();
+        cell(row, stop.mile);
+        cell(row, stop.name);
+        cell(row, `${stop.city}, ${stop.state}`);
+        cell(row, stop.price_per_gallon.toFixed(3));
+        cell(row, stop.gallons);
+        cell(row, `$${stop.cost.toFixed(2)}`);
+      }
+      document.getElementById("map").hidden = false;
+      document.getElementById("result").hidden = false;
+      const map = L.map("map");
+      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 18, attribution: "&copy; OpenStreetMap contributors"
+      }).addTo(map);
+      const route = L.geoJSON(trip.route.geometry, { style: { color: "#1565c0", weight: 4 } }).addTo(map);
+      for (const stop of trip.fuel_stops) {
+        const [lon, lat] = stop.location.coordinates;
+        const popup = document.createElement("div");
+        popup.innerText = `${stop.name}\n${stop.city}, ${stop.state}\nMile ${stop.mile}\n` +
+          `${stop.gallons} gal x $${stop.price_per_gallon.toFixed(3)} = $${stop.cost.toFixed(2)}`;
+        L.marker([lat, lon]).addTo(map).bindPopup(popup);
+      }
+      map.fitBounds(route.getBounds());
+    }
+
+    async function plan() {
+      showStatus("Planning route…", false);
+      const body = {
+        start: params.get("start"),
+        finish: params.get("finish"),
+        initial_fuel_gallons: Number(params.get("initial_fuel_gallons") || 0),
+      };
+      try {
+        const response = await fetch("/api/v1/routes/optimize/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          showStatus(`Route could not be planned (${response.status} ${data.error}): ${data.detail}`, true);
+          return;
+        }
+        showStatus("", false);
+        render(data);
+      } catch (error) {
+        showStatus(`Could not reach the API: ${error}`, true);
+      }
+    }
+
+    if (params.get("start") && params.get("finish")) plan();
   </script>
-{% else %}
-  <div class="panel error"><h1>Route could not be planned</h1><p>{{ error.detail }}</p></div>
-{% endif %}
 </body>
 </html>

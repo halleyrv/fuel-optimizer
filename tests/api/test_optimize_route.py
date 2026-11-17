@@ -58,7 +58,7 @@ def test_returns_route_stops_summary_and_map_link(client, planner):
         "total_fuel_cost": 103.71,
         "number_of_stops": 1,
     }
-    assert body["map_url"] == "http://testserver/api/v1/routes/map/?start=A%2C+NE&finish=B%2C+NE&initial_fuel_gallons=0"
+    assert body["map_url"] == "http://testserver/map/?start=A%2C+NE&finish=B%2C+NE&initial_fuel_gallons=0"
 
 
 def test_initial_fuel_defaults_to_zero(client, planner):
@@ -101,22 +101,19 @@ def test_failures_map_to_stable_error_codes(client, planner, error, status, expe
     assert body["detail"]
 
 
-def test_map_page_renders_the_route_and_stops(client, planner):
-    response = client.get("/api/v1/routes/map/", {"start": "A, NE", "finish": "B, NE"})
+def test_demo_page_is_a_client_of_the_api_and_plans_nothing_itself(client, planner):
+    response = client.get("/map/", {"start": "A, NE", "finish": "B, NE"})
 
     assert response.status_code == 200
     html = response.content.decode()
-    assert "leaflet" in html and "STOP" in html and "103.71" in html
-    assert planner.calls == [("A, NE", "B, NE", D(0))]
+    assert '<form' in html and 'name="start"' in html and 'name="finish"' in html and 'name="initial_fuel_gallons"' in html
+    assert 'fetch("/api/v1/routes/optimize/"' in html
+    assert "leaflet" in html
+    assert planner.calls == []
 
 
-def test_map_page_shows_errors_with_their_status(client, planner):
-    planner.result = LocationNotFound("start", "Atlantis")
-
-    response = client.get("/api/v1/routes/map/", {"start": "Atlantis", "finish": "B, NE"})
-
-    assert response.status_code == 404
-    assert "Atlantis" in response.content.decode()
+def test_map_moved_out_of_the_api_namespace(client, planner):
+    assert client.get("/api/v1/routes/map/", {"start": "A, NE", "finish": "B, NE"}).status_code == 404
 
 
 def test_malformed_json_uses_the_same_error_shape(client, planner):

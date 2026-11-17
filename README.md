@@ -23,7 +23,7 @@ Then open:
 | URL | What |
 |-----|------|
 | `http://localhost:8000/api/docs/` | Swagger UI: every field and error code, with "Try it out" |
-| `http://localhost:8000/api/v1/routes/map/?start=Chicago%2C+IL&finish=Denver%2C+CO` | The plan on a map (the `map_url` in every response) |
+| `http://localhost:8000/map/` | Demo page: type a start and finish and see the plan on a map (every response's `map_url` opens it) |
 | `http://localhost:8000/api/schema/` | OpenAPI 3 schema, importable into Postman |
 
 Optional: put any variable from [Configuration](#configuration) in a `.env` file. Without it, local development defaults apply.
@@ -38,6 +38,10 @@ Optional: put any variable from [Configuration](#configuration) in a `.env` file
 | `initial_fuel_gallons` | no | 0–50, default 0 (see assumptions) |
 
 The response has `route` (distance, duration, GeoJSON line), `fuel_stops` (station, mile, price, gallons, cost), `summary` (`total_fuel_cost` and totals) and `map_url`.
+
+Use `"City, ST"` (e.g. `"Chicago, IL"`) for the most precise and fastest result: it resolves offline. Other text goes to Nominatim, which may pick a different point in the same city, so results can differ slightly.
+
+The API returns JSON only. `/map/` is a minimal demo client outside the API: a static page that calls `POST /api/v1/routes/optimize/` and draws the result with Leaflet, the same way any frontend would.
 
 Real results from the supplied data:
 
@@ -57,7 +61,7 @@ Each requirement from [`docs/assignment.md`](docs/assignment.md), where it is me
 | Requirement | Where | Proven by |
 |-------------|-------|-----------|
 | Start and finish within the USA | `CityStateResolver`: offline Gazetteer, Nominatim fallback restricted to the US | `test_city_state_is_resolved_offline_without_the_fallback`, `test_nominatim_returns_the_first_us_match_and_caches_it` |
-| Return a map of the route | GeoJSON `route.geometry` + `map_url` → `GET /api/v1/routes/map/` (Leaflet) | `test_returns_route_stops_summary_and_map_link`, `test_map_page_renders_the_route_and_stops` |
+| Return a map of the route | GeoJSON `route.geometry` and stop locations in the response; `map_url` opens the `/map/` demo page | `test_returns_route_stops_summary_and_map_link`, `test_demo_page_is_a_client_of_the_api_and_plans_nothing_itself` |
 | Optimal (cost-effective) fuel stops | Greedy in `fuel_route/domain/optimizer.py` | `test_buys_only_enough_to_reach_the_next_cheaper_station`, `test_greedy_matches_the_exact_optimum_on_random_routes` |
 | 500-mile range, multiple fuel-ups | `_next_stop` never plans beyond a full tank | `test_fills_the_tank_when_no_cheaper_station_is_in_range`, `test_gap_longer_than_the_range_is_infeasible` |
 | Total money spent at 10 MPG | `summary.total_fuel_cost` (`Decimal`) | `test_empty_tank_buys_only_the_fuel_the_trip_needs_at_the_origin`, `test_returns_route_stops_summary_and_map_link` |
@@ -113,9 +117,9 @@ fuel-optimizer/
 │   ├── domain/          # pure Python: fuel optimizer, station and geocoding rules
 │   ├── application/     # use cases: import_stations, plan_trip (+ Protocol ports)
 │   ├── infrastructure/  # adapters: Census Gazetteer, Nominatim, OSRM, PostGIS, CSV
-│   ├── api/             # DRF view, OpenAPI serializers, map page
+│   ├── api/             # DRF view and OpenAPI serializers (JSON only)
 │   ├── management/      # import_stations command
-│   └── templates/       # map page (Leaflet)
+│   └── templates/       # /map/ demo page: calls the API, draws with Leaflet
 ├── config/              # Django settings and URLs
 ├── docs/                # assignment, domain rules, architecture, API contract, reviews
 ├── data/                # fuel price CSV + Census Gazetteer files
