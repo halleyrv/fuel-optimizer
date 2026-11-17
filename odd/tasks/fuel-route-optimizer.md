@@ -23,7 +23,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 
 - [x] T0 docs: fix CLAUDE.md, domain-rules geocoding/duplicates, architecture.md — inline — 43a8c6e
 - [x] T1 S6 S8: scaffold (Django 6.1, DRF, PostGIS, Docker) + station import with Gazetteer geocoding — inline — see commit `feat(stations)`
-- [ ] T2 S6: Nominatim fallback for unmatched cities, cached in `data/geocode_cache.json` — inline
+- [x] T2 S6: Nominatim fallback for unmatched cities, cached in `data/geocode_cache.json` — inline — branch feat/missing-cities: cf08977, 06e2af7
 - [x] T3 S3 S4 S10 S11: fuel optimizer (pure domain, TDD) — inline — branch feat/fuel-optimizer
 - [x] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline — branch feat/route-planning (2d3209f, f91d624, 1618472, refactor + feat(trip))
 - [x] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline — branch feat/api (feat(api), perf(routing))
@@ -50,3 +50,4 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - L16: T6 done. README quick start verified from a clean state (down -v, up --build, import, curl): Chicago→Denver $300.84. README examples are real API results. Loom script in odd/loom-script.md (5 min, English). README no longer references .env.example (user still has to create it; agent is denied .env* files).
 - L17: odd/loom-script.md untracked (ce42a68) and excluded via .git/info/exclude. User decided NOT to rewrite history: the script remains visible in commit 49d3232 ("no, mejor no hagamos esto. no es grave").
 - L18: T7 done in 3 commits, domain tests green after each (incl. DP cross-check). mutmut found a new gap (exact-fuel arrival must not record an empty stop) — test added; 221/224 detected, 3 documented equivalents. Live results identical to README (Dallas→Houston $65.82, Chicago→Denver $300.84 / $220.87, NY→LA $857.34). 88 tests pass.
+- L19: T2 done. resolve_missing_cities: 134/135 cities resolved online once (238 s, state validated via ISO3166-2); Canton, MI fixed offline (charter township suffix, +118 Gazetteer entries). Import now covers all 6,626 US stations (6,450 offline + 176 cached). README trips unchanged. 95 tests pass.
