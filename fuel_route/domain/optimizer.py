@@ -91,7 +91,6 @@ def plan_fuel(
         key=lambda p: (p.mile, p.price),
     )
     points = [*on_route, destination]
-    full_range = vehicle.tank_gallons * vehicle.mpg
 
     # Departure: nothing can be bought at the origin. An origin-window station is reachable
     # even on an empty tank; the fuel for those first miles is bought (and paid) there.
@@ -104,14 +103,7 @@ def plan_fuel(
     fuel, i, stops = initial_fuel - first.mile / vehicle.mpg, 0, []
     while points[i] is not destination:
         here = points[i]
-        in_range = list(takewhile(lambda k: points[k].mile - here.mile <= full_range, range(i + 1, len(points))))
-        if not in_range:
-            raise InfeasibleRoute(InfeasibleReason.GAP_EXCEEDS_RANGE, here.station.mile)
-        cheaper = next((k for k in in_range if points[k].price < here.price), None)
-        if cheaper is not None:
-            j, target = cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
-        else:
-            j, target = min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
+        j, target = _next_stop(points, i, vehicle)
         gallons = max(ZERO, target - fuel)  # fuel < 0 only after a departure-window arrival
         if gallons > 0:
             stops.append(
@@ -128,3 +120,20 @@ def plan_fuel(
         i = j
 
     return FuelPlan(stops, initial_fuel, fuel)
+
+
+def _next_stop(points: list[_Point], i: int, vehicle: Vehicle) -> tuple[int, Decimal]:
+    """From station i: the next point to drive to and the fuel needed when leaving.
+
+    The next cheaper point in range wins (buy just enough to reach it); otherwise
+    fill the tank and go to the cheapest point in range.
+    """
+    here = points[i]
+    full_range = vehicle.tank_gallons * vehicle.mpg
+    in_range = list(takewhile(lambda k: points[k].mile - here.mile <= full_range, range(i + 1, len(points))))
+    if not in_range:
+        raise InfeasibleRoute(InfeasibleReason.GAP_EXCEEDS_RANGE, here.station.mile)
+    cheaper = next((k for k in in_range if points[k].price < here.price), None)
+    if cheaper is not None:
+        return cheaper, (points[cheaper].mile - here.mile) / vehicle.mpg
+    return min(in_range, key=lambda k: points[k].price), vehicle.tank_gallons
