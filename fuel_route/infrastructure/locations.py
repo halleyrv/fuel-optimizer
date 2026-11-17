@@ -7,7 +7,7 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.core.cache import cache as django_cache
 
-from fuel_route.application.plan_trip import LocationResolver
+from fuel_route.application.plan_trip import ExternalServiceError, LocationResolver
 from fuel_route.domain.geocoding import Place, PlaceIndex, parse_city_state
 from fuel_route.infrastructure.gazetteer import load_gazetteer
 from fuel_route.infrastructure.http import get_json
@@ -40,6 +40,8 @@ class NominatimResolver:
         if cached is None:
             params = urlencode({"q": query, "format": "jsonv2", "countrycodes": "us", "limit": 1})
             results = get_json("nominatim", f"{settings.NOMINATIM_URL}/search?{params}")
+            if not isinstance(results, list):
+                raise ExternalServiceError(f"nominatim returned an unexpected response: {results!r}")
             cached = (float(results[0]["lat"]), float(results[0]["lon"])) if results else _NOT_FOUND
             django_cache.set(key, cached, timeout=None)
         return None if cached == _NOT_FOUND else Place(cached[0], cached[1], 0.0)

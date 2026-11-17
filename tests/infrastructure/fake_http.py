@@ -1,6 +1,7 @@
 import io
 import json
 from unittest import mock
+from urllib.error import HTTPError
 
 
 def respond(*payloads):
@@ -14,3 +15,7 @@ def respond(*payloads):
 
     queue = iter(payloads)
     return mock.patch("fuel_route.infrastructure.http.urlopen", side_effect=fake_urlopen)
+
+
+def http_error(status, body):
+    return HTTPError("http://test", status, "error", {}, io.BytesIO(json.dumps(body).encode()))

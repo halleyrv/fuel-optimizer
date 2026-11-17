@@ -6,7 +6,7 @@ from django.core.cache import cache
 from fuel_route.application.plan_trip import ExternalServiceError
 from fuel_route.domain.geocoding import Place, PlaceIndex
 from fuel_route.infrastructure.locations import CityStateResolver, NominatimResolver
-from tests.infrastructure.fake_http import respond
+from tests.infrastructure.fake_http import http_error, respond
 
 NEW_YORK = Place(40.71, -74.0, 1000.0)
 
@@ -62,4 +62,14 @@ def test_nominatim_without_results_returns_none():
 
 def test_nominatim_network_failure_is_reported_as_external_error():
     with respond(URLError("timed out")), pytest.raises(ExternalServiceError, match="nominatim"):
+        NominatimResolver().resolve("Somewhere")
+
+
+def test_nominatim_http_error_is_reported_as_external_error():
+    with respond(http_error(429, {"error": "rate limited"})), pytest.raises(ExternalServiceError, match="nominatim"):
+        NominatimResolver().resolve("Somewhere")
+
+
+def test_nominatim_unexpected_payload_is_reported_as_external_error():
+    with respond({"error": "unexpected"}), pytest.raises(ExternalServiceError, match="nominatim"):
         NominatimResolver().resolve("Somewhere")
