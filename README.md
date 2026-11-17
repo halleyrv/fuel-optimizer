@@ -52,15 +52,33 @@ Errors always return `{"error": "<code>", "detail": "..."}`: `invalid_request` (
 
 ## How it works
 
-```
-"City, ST" ──► Census Gazetteer (offline) ─┐
-other text ──► Nominatim (cached) ─────────┤
-                                           ▼
-                        OSRM: 1 call ──► route line
-                                           ▼
-              PostGIS: stations within the corridor, mile along the route
-                                           ▼
-                 Greedy optimizer ──► stops, gallons, cost
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant API as Django API
+    participant G as Census Gazetteer (offline)
+    participant N as Nominatim
+    participant O as OSRM
+    participant DB as PostGIS
+    participant F as Fuel optimizer (domain)
+
+    C->>API: POST /api/v1/routes/optimize/ {start, finish}
+    API->>G: resolve "City, ST"
+    opt other text, or city not found
+        API->>N: search (cached)
+    end
+    alt trip already routed
+        API->>API: route from cache (no external call)
+    else first time
+        API->>O: one route request
+        O-->>API: distance, duration, GeoJSON line
+    end
+    API->>DB: stations within the corridor (GIST index)
+    DB-->>API: stations with their mile along the route
+    API->>F: plan_fuel(distance, stations, initial fuel)
+    F-->>API: stops, gallons, cost
+    API-->>C: route, fuel_stops, summary, map_url
 ```
 
 1. **Stations are geocoded once, at import.** The CSV has no coordinates and 7,464 of 8,151 addresses are highway exits (`I-44, EXIT 283`), so each station is placed at its city's center using the US Census Gazetteer (offline, public domain). 6,447 of 6,626 US stations resolve (97.3%).
