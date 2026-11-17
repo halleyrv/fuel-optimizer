@@ -74,6 +74,12 @@
       border: 2px solid var(--line); border-top-color: var(--sign); border-radius: 50%; animation: spin 0.8s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+    .status .retry {
+      display: block; margin-top: 10px; padding: 8px 16px; border: 0; border-radius: 6px; cursor: pointer;
+      background: var(--sign); color: #fff; font: 800 14px var(--display);
+    }
+    .status .retry:hover { background: var(--sign-dark); }
+    .status .retry:focus-visible { outline: 3px solid var(--lane); outline-offset: 2px; }
 
     .figures { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 0 0 20px; }
     .figure { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px; }
@@ -408,6 +414,19 @@
       });
     }
 
+    // The start has no station nearby: offer the same trip departing with a full tank (50 gal).
+    function offerFullTank() {
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "retry";
+      retry.textContent = "Retry with a full tank";
+      retry.addEventListener("click", () => {
+        params.set("initial_fuel_gallons", "50");
+        window.location.search = params.toString();
+      });
+      statusBox.append(retry);
+    }
+
     async function plan() {
       const button = form.querySelector("button");
       button.disabled = true;
@@ -434,6 +453,7 @@
       }
       if (!response.ok) {
         showStatus(`${data.detail} (${data.error}, HTTP ${response.status})`, "error");
+        if (data.error === "no_station_near_origin") offerFullTank();
         return;
       }
       showStatus("", null);

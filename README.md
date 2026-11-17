@@ -139,14 +139,14 @@ The assignment leaves these open; each is a deliberate, documented decision ([`d
 | Station location | City center, flagged `location_precision: "city"` | Highway-exit addresses cannot be street-geocoded. Coordinates are approximate, never invented. |
 | Duplicate stations | 678 OPIS IDs appear more than once (same address); one station at the median price | The CSV has no timestamps, so no row can be preferred as the latest. |
 | Number of stops | Cost-optimal plans can include small top-ups (e.g. 0.9 gal) | A minimum purchase or per-stop cost breaks the greedy guarantee. The right fix is dynamic programming with a per-stop cost; out of scope here. |
-| Data coverage | The CSV has only 16 California rows (Imperial Valley) and 620 Canadian rows (excluded) | Routes into Los Angeles refuel in Nevada; the last stretch (~235 mi) is within range. |
+| Data coverage | The CSV has only 16 California rows (Imperial Valley) and 620 Canadian rows (excluded) | Trips into Los Angeles refuel in Nevada; the last stretch (~235 mi) is within range. Trips *from* Los Angeles cannot start on an empty tank (the nearest station is ~230 mi away, in Nevada): the API returns `no_station_near_origin` explaining to send `initial_fuel_gallons`, and the demo page offers "Retry with a full tank" ($702.71 to New York with 50 gal). |
 | Mile along the route | Approximate (line fraction measured in degrees) | Good enough for city-level station positions. |
 
 ## Quality checks
 
 | Check | Command | Result |
 |-------|---------|--------|
-| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 96 passing |
+| Tests (domain, adapters, PostGIS, API) | `docker compose run --rm web pytest` | 97 passing |
 | Mutation testing (domain) | `rm -rf mutants && uv run mutmut run` | 221 of 224 mutants detected; 3 equivalent, documented in [`docs/mutation-testing.md`](docs/mutation-testing.md) |
 | OpenAPI schema | `docker compose run --rm web python manage.py spectacular --validate --fail-on-warn` | valid, no warnings (also run in tests) |
 | External review | Antigravity, against [`docs/review-guidelines.md`](docs/review-guidelines.md) | 2 rounds; findings verified before fixing, 1 false positive dismissed with evidence |
