@@ -86,14 +86,25 @@ sequenceDiagram
 3. **Corridor search in PostGIS.** A station qualifies within 5 km of the route plus its city's radius (capped at 10 km), using the spatial index. `ST_LineLocatePoint` gives its mile along the route.
 4. **Greedy optimizer.** At each station: buy just enough to reach the next cheaper station within range; if there is none, fill the tank and continue to the cheapest station in range. This is provably optimal for a single route, and it is verified against an exhaustive dynamic-programming search on 200 random routes.
 
-Code layout (pragmatic hexagonal, see [`docs/architecture.md`](docs/architecture.md)):
+## Project structure
 
-| Layer | Path | Depends on |
-|-------|------|------------|
-| Domain | `fuel_route/domain/` | nothing (pure Python, `Decimal` money) |
-| Application | `fuel_route/application/` | domain + `Protocol` ports |
-| Infrastructure | `fuel_route/infrastructure/` | Gazetteer, Nominatim, OSRM, PostGIS |
-| API | `fuel_route/api/` | DRF views, OpenAPI schema, map page |
+Pragmatic hexagonal architecture ([`docs/architecture.md`](docs/architecture.md)):
+
+```
+fuel_route/
+├── domain/            # pure Python: fuel optimizer, station and geocoding rules
+├── application/       # use cases: import_stations, plan_trip (+ Protocol ports)
+├── infrastructure/    # adapters: Census Gazetteer, Nominatim, OSRM, PostGIS, CSV
+├── api/               # DRF view, OpenAPI serializers, map page
+├── management/        # import_stations command
+└── templates/         # map page (Leaflet)
+config/                # Django settings and URLs
+docs/                  # assignment, domain rules, architecture, API contract, reviews
+data/                  # fuel price CSV + Census Gazetteer files
+tests/                 # domain, application, infrastructure, integration (PostGIS), api
+```
+
+Dependencies point inward: `api` and `infrastructure` → `application` → `domain`. The domain imports nothing from Django, the database or HTTP clients.
 
 ## Assumptions and trade-offs
 
