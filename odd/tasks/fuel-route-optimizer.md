@@ -16,6 +16,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - S9 (decision 4): "Utilizar el mismo Gazetteer offline para resolver ciudades y estados." / "Si no se encuentran, utilizar Nominatim como fallback con caché." / "No superar las 3 llamadas externas por petición."
 - S10 (decision 5): "Mantener la regla actual de `domain-rules.md`: buscar la siguiente estación alcanzable con un precio inferior." / "Respetar siempre las 500 millas de autonomía."
 - S11 (user, 2026-11-16): initial fuel. User: "sí, me cierra, arrancá con el optimizador y Y si es necesario documentarlo en algún lado, un supuesto esto también para poder explicarlo." Agreed model: default 0 gallons, departure fill-up at stations within the first 15 miles; optional `initial_fuel_gallons` (0–50) not charged; no station near origin → infeasible.
+- S12 (user, 2026-11-17, future refactor): "Después refactorizá plan_fuel en optimizer.py con guard clauses: sacá el origen del loop, extraé _next_stop y _buy, sin interfaces ni Strategy. Mantené los tests en verde (incluido el de la búsqueda exhaustiva) y hacé un commit separado para cada cosa."
 
 ## Tasks
 
@@ -26,6 +27,7 @@ Branch: `feat/station-import` (one branch per stage). Delivery: ask-on-risk. Tes
 - [ ] T4 S5 S7 S9: OSRM adapter, start/finish resolution, PostGIS corridor query — inline
 - [ ] T5 S1 S2 S4: API endpoint, `docs/api-contract.md`, map view — inline
 - [ ] T6: README, Loom script — inline
+- [ ] T7 S12: refactor `plan_fuel` with guard clauses (origin out of the loop, extract `_next_stop` and `_buy`), no interfaces or Strategy; tests green incl. DP cross-check and mutmut; one commit per step — inline, after T6
 
 ## Log
 
