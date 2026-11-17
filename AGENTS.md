@@ -91,6 +91,8 @@ Preserve existing architectural decisions unless a change is explicitly justifie
 
 - Prioritize unit tests for domain logic.
 
+- Before closing a feature that changes `fuel_route/domain`, run mutation testing: `rm -rf mutants && uv run mutmut run`, then `uv run mutmut results`. Every surviving mutant gets a test, or is listed as equivalent in `docs/mutation-testing.md` with the reason.
+
 - Run relevant tests after every implementation phase.
 
 - Apply SOLID principles pragmatically.

@@ -9,7 +9,11 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest", "pytest-django==4.14.0"]
+dev = [
+    "mutmut==3.8.1",
+    "pytest",
+    "pytest-django==4.14.0",
+]
 
 [tool.uv]
 package = false
@@ -17,3 +21,8 @@ package = false
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "config.settings"
 testpaths = ["tests"]
+
+[tool.mutmut]
+source_paths = ["fuel_route/domain/"]
+pytest_add_cli_args_test_selection = ["tests/domain/"]
+pytest_add_cli_args = ["-p", "no:django"]
