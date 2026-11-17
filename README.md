@@ -50,6 +50,23 @@ Real results from the supplied data:
 
 Errors always return `{"error": "<code>", "detail": "..."}`: `invalid_request` (400), `location_not_found` (404), `route_not_found` / `no_station_near_origin` / `gap_exceeds_range` (422), `external_service_error` (502). Details in [`docs/api-contract.md`](docs/api-contract.md) and Swagger.
 
+## Requirements coverage
+
+Each requirement from [`docs/assignment.md`](docs/assignment.md), where it is met and the test that proves it.
+
+| Requirement | Where | Proven by |
+|-------------|-------|-----------|
+| Start and finish within the USA | `CityStateResolver`: offline Gazetteer, Nominatim fallback restricted to the US | `test_city_state_is_resolved_offline_without_the_fallback`, `test_nominatim_returns_the_first_us_match_and_caches_it` |
+| Return a map of the route | GeoJSON `route.geometry` + `map_url` → `GET /api/v1/routes/map/` (Leaflet) | `test_returns_route_stops_summary_and_map_link`, `test_map_page_renders_the_route_and_stops` |
+| Optimal (cost-effective) fuel stops | Greedy in `fuel_route/domain/optimizer.py` | `test_buys_only_enough_to_reach_the_next_cheaper_station`, `test_greedy_matches_the_exact_optimum_on_random_routes` |
+| 500-mile range, multiple fuel-ups | `_next_stop` never plans beyond a full tank | `test_fills_the_tank_when_no_cheaper_station_is_in_range`, `test_gap_longer_than_the_range_is_infeasible` |
+| Total money spent at 10 MPG | `summary.total_fuel_cost` (`Decimal`) | `test_empty_tank_buys_only_the_fuel_the_trip_needs_at_the_origin`, `test_returns_route_stops_summary_and_map_link` |
+| Use the supplied fuel price file | `import_stations`: CSV, duplicates at median price, offline geocoding | `test_import_stores_located_stations_and_reports_exclusions`, `test_rows_with_same_id_become_one_station_priced_at_the_median` |
+| Free map and routing APIs | OSRM public server, Nominatim, OpenStreetMap tiles | `test_one_request_returns_distance_duration_and_geometry` |
+| Latest stable Django | Django 6.1.3 pinned in `pyproject.toml` (latest stable on PyPI when built) | `pyproject.toml` |
+| Return results quickly | Route cache, simplified geometry, GIST index: NY→LA 3.6 s cold, 0.7 s cached | `test_repeated_route_is_served_from_cache_without_a_second_call` |
+| One routing call is ideal | Exactly one OSRM call per new trip, none when cached; no geocoding call for `"City, ST"` | `test_plans_fuel_stops_on_the_routed_trip_with_one_routing_call`, `test_repeated_route_is_served_from_cache_without_a_second_call` |
+
 ## How it works
 
 ```mermaid
