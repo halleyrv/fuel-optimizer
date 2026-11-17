@@ -16,7 +16,8 @@ def test_rows_with_same_id_become_one_station_priced_at_the_median():
 
 
 def test_even_count_median_is_rounded_half_up_to_four_decimals():
-    [station] = consolidate([row(1, "3.00005"), row(1, "3.0001")])
+    # median 3.00005 is an exact half: half-up gives 3.0001 (banker's rounding would give 3.0000)
+    [station] = consolidate([row(1, "3.0000"), row(1, "3.0001")])
 
     assert station.price == Decimal("3.0001")
 

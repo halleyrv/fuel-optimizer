@@ -50,3 +50,30 @@ def test_lookup_ignores_spacing_differences_between_sources():
 
     assert index.locate("Mc Calla", "AL") == PLACE
     assert index.locate("De Forest", "WI") == PLACE
+
+
+def test_alias_never_replaces_a_real_place_even_if_larger():
+    index = PlaceIndex()
+    larger_alias = Place(1.0, 2.0, 9999.0)
+    index.add("Boise", "ID", PLACE)
+    index.add("Boise", "ID", larger_alias, alias=True)
+
+    assert index.locate("Boise", "ID") == PLACE
+
+
+def test_real_place_replaces_an_earlier_alias():
+    index = PlaceIndex()
+    alias_place = Place(1.0, 2.0, 9999.0)
+    index.add("Boise", "ID", alias_place, alias=True)
+    index.add("Boise", "ID", PLACE)
+
+    assert index.locate("Boise", "ID") == PLACE
+
+
+def test_first_place_wins_when_two_places_tie_on_size():
+    index = PlaceIndex()
+    twin = Place(1.0, 2.0, PLACE.radius_m)
+    index.add("Springfield", "IL", PLACE)
+    index.add("Springfield", "IL", twin)
+
+    assert index.locate("Springfield", "IL") == PLACE

@@ -88,6 +88,7 @@ def test_gap_longer_than_the_range_is_infeasible():
 
     assert error.value.reason == InfeasibleReason.GAP_EXCEEDS_RANGE
     assert error.value.at_mile == D(0)
+    assert str(error.value) == "gap_exceeds_range at mile 0"
 
 
 def test_empty_tank_without_a_station_near_the_origin_is_infeasible():
@@ -95,6 +96,15 @@ def test_empty_tank_without_a_station_near_the_origin_is_infeasible():
         plan_fuel(D(300), [station(1, "40", "3.0")], TRUCK)
 
     assert error.value.reason == InfeasibleReason.NO_STATION_NEAR_ORIGIN
+    assert error.value.at_mile == D(0)
+
+
+def test_initial_fuel_too_short_for_the_first_station_is_a_range_gap():
+    with pytest.raises(InfeasibleRoute) as error:
+        plan_fuel(D(300), [station(1, "40", "3.0")], TRUCK, initial_fuel=D(2))
+
+    assert error.value.reason == InfeasibleReason.GAP_EXCEEDS_RANGE
+    assert error.value.at_mile == D(0)
 
 
 def test_station_inside_the_origin_window_counts_as_departure_fuel():
@@ -105,8 +115,14 @@ def test_station_inside_the_origin_window_counts_as_departure_fuel():
 
 @pytest.mark.parametrize("initial", ["-1", "50.1"])
 def test_initial_fuel_must_fit_in_the_tank(initial):
-    with pytest.raises(ValueError, match="initial_fuel"):
+    with pytest.raises(ValueError, match="^initial_fuel must be between 0 and the tank capacity$"):
         plan_fuel(D(100), [], TRUCK, initial_fuel=D(initial))
+
+
+def test_a_full_initial_tank_is_accepted():
+    plan = plan_fuel(D(100), [], TRUCK, initial_fuel=D(50))
+
+    assert plan.remaining_fuel == D(40)
 
 
 def brute_force_cost(route_miles: int, stations: list[StationOnRoute], tank: int, mpg: int) -> Decimal | None:
@@ -154,4 +170,5 @@ def test_origin_window_station_keeps_its_real_position_for_range_checks():
 
     # 1 gallon pays for the 10 miles driven before the departure station, then the tank is filled.
     assert purchases(plan) == [(1, D(51), D("153.00")), (2, D(9), D("27.00"))]
+    assert [(stop.mile, stop.price) for stop in plan.stops] == [(D(10), D("3.0")), (D(505), D("3.0"))]
     assert_fuel_balances(plan, "600")
